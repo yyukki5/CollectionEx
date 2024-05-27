@@ -9,6 +9,17 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Const APP_NAME_EXCEL As String = "Microsoft Excel"
+Private Const APP_NAME_ACCESS As String = "Microsoft Access"
+
+Private app_ As Object
+    
+    
+Private Sub Class_Initialize()
+    If Application.name = APP_NAME_EXCEL Or Application.name = APP_NAME_ACCESS Then Else Debug.Print "This application is not supported Evaluate()/Eval()"
+    Set app_ = Application
+End Sub
+
 Public Function EvaluateLambda(val, str)
     Dim varstr, formulastr, res, reval, calculatedBracketsString As String
     
@@ -16,7 +27,7 @@ Public Function EvaluateLambda(val, str)
 
     formulastr = ProcessParentheses(val, varstr, CStr(formulastr))
     Call CalcInnerBrackets(val, varstr, formulastr)
-    res = Application.Evaluate(formulastr)
+    res = RunEvaluate(formulastr)
     If VarType(res) <> vbBoolean Then Err.Raise 9001, "Lambda.EvaluateLambda()", "Unsupport error: can not evaluate result as boolen"
     EvaluateLambda = res
 End Function
@@ -148,10 +159,10 @@ Private Function ProcessParentheses(var, varstr, inputStr As String) As String
         ElseIf char = ")" Then
             If InStr(currentContent, varstr) > 0 Then
                 calculatedString = CalcInnerBrackets(var, varstr, currentContent)
-                calclatedContent = Application.Evaluate(calculatedString)
+                calclatedContent = RunEvaluate(calculatedString)
                 If IsError(calclatedContent) Then Err.Raise 9006, "Lambda.ProcessParentheses()", "Unsupported lambda string. can not evaluate formula"
             Else
-                calclatedContent = Application.Evaluate(currentContent)
+                calclatedContent = RunEvaluate(currentContent)
             End If
             ' after close bracket ----------
             If stack.Count > 0 Then
@@ -170,7 +181,17 @@ Private Function ProcessParentheses(var, varstr, inputStr As String) As String
     ProcessParentheses = currentContent
 End Function
 
-
+Private Function RunEvaluate(formulastr) As Variant
+    Dim res
+    If Application.name = APP_NAME_EXCEL Then
+        res = app_.Evaluate(formulastr)
+    ElseIf Application.name = APP_NAME_ACCESS Then
+        res = app_.Eval(formulastr)
+    Else
+        Err.Raise 9900, "Lambda.RunEvaluate()", "This application is not supported Evaluate()/Eval()"
+    End If
+    RunEvaluate = res
+End Function
 
 
 
