@@ -112,28 +112,42 @@ Private Function IsOperator(str) As Boolean
 End Function
 
 Private Function SetCallByNameValue(cls, propName As String, ByRef reval, Optional args As Variant) As Boolean
-    On Error GoTo errNotImplement
     If IsMissing(args) Then
-        If IsObject(CallByName(cls, propName, VbGet)) Then
-            Set reval = CallByName(cls, propName, VbGet)
-            SetCallByNameValue = True
+        On Error GoTo errGetWithoutArg
+        Call SetObjBuf(CallByName(cls, propName, VbGet), reval)
+        SetCallByNameValue = IsObject(reval)
+        Exit Function
+errGetWithoutArg:
+        If Err.Number = 450 Then
+            Call SetObjBuf(CallByName(cls, propName, VbMethod), reval)
+            SetCallByNameValue = IsObject(reval)
+        ElseIf Err.Number = 438 Then
+            Err.Raise 9001, "Lambda.SetCallByNameValue()", "Not implemented property: " & TypeName(cls) & "." & propName
         Else
-            reval = CallByName(cls, propName, VbGet)
-            SetCallByNameValue = False
+            Err.Raise Err.Number, Err.Source, Err.Description
         End If
     Else
-        If IsObject(CallByName(cls, propName, VbGet, args)) Then
-            Set reval = CallByName(cls, propName, VbGet, args)
-            SetCallByNameValue = True
+        On Error GoTo errGetWitArg
+        Call SetObjBuf(CallByName(cls, propName, VbGet, args), reval)
+        SetCallByNameValue = IsObject(reval)
+        Exit Function
+errGetWitArg:
+        If Err.Number = 450 Then
+            Call SetObjBuf(CallByName(cls, propName, VbMethod, args), reval)
+            SetCallByNameValue = IsObject(reval)
+        ElseIf Err.Number = 438 Then
+            Err.Raise 9001, "Lambda.SetCallByNameValue()", "Not implemented property: " & TypeName(cls) & "." & propName
         Else
-            reval = CallByName(cls, propName, VbGet, args)
-            SetCallByNameValue = False
+            Err.Raise Err.Number, Err.Source, Err.Description
         End If
     End If
     Exit Function
-errNotImplement:
-    If Err.Number = 438 Then Err.Raise 9001, "Lambda.SetCallByNameValue()", "Not implemented property: " & TypeName(cls) & "." & propName _
-        Else Err.Raise Err.Number, Err.Source, Err.Description
+End Function
+
+Private Function SetObjBuf(ByRef val, ByRef reval)
+    Dim isObj As Boolean
+    isObj = IsObject(val)
+    If isObj Then Set reval = val Else reval = val
 End Function
 
 Private Function ProcessParentheses(var, varstr, inputStr As String) As String

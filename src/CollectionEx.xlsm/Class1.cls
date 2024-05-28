@@ -30,7 +30,6 @@ Property Get IsCls2(cls2 As Class2)
 End Property
 
 
-
 Function Init(a) As Class1
     abc_ = a
     Set def_ = New Class2
@@ -38,7 +37,10 @@ Function Init(a) As Class1
     Set Init = Me
 End Function
 
-
 Function Equals(cls1 As Class1) As Boolean
     Equals = Me.abc = cls1.abc
+End Function
+
+Function DebugPrint()
+    Debug.Print abc_
 End Function
