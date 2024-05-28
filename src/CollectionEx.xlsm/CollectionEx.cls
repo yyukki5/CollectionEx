@@ -12,8 +12,8 @@ Option Explicit
 Private items_ As Collection
 
 ' Note --------------------------------------
-' Project:
-' Version: 0.1.0 (developping)
+' Project: https://github.com/yyukki5/CollectionEx
+' Version: 0.2.0 (developping)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -36,19 +36,18 @@ Private Property Get IsItemTypeObject() As Boolean
     IsItemTypeObject = IsObject(items_(1))
 End Property
 
-
 Public Function WhereByEvaluatedLambda(lambdaString As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula, lambda As New lambda
+    Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula, Lambda As New Lambda
     For Each c In items_
-        If lambda.EvaluateLambda(c, lambdaString) Then col.Add c
+        If Lambda.EvaluateLambda(c, lambdaString) Then col.Add c
     Next
     Set WhereByEvaluatedLambda = recol.Init(col)
 End Function
 
 Public Function SelectByLambda(lambdaString As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, lambda As New lambda
+    Dim col As New Collection, c, recol As New CollectionEx, Lambda As New Lambda
     For Each c In items_
-        col.Add lambda.SelectLambdaValue(c, lambdaString)
+        col.Add Lambda.SelectLambdaValue(c, lambdaString)
     Next
     Set SelectByLambda = recol.Init(col)
 End Function
@@ -85,18 +84,18 @@ End Function
 
 Public Function AllEvaluate(lambdaString As String) As Boolean
     AllEvaluate = False
-    Dim col As New Collection, c, recol As New CollectionEx, lambda As New lambda
+    Dim col As New Collection, c, recol As New CollectionEx, Lambda As New Lambda
     For Each c In items_
-         If lambda.EvaluateLambda(c, lambdaString) = False Then Exit Function
+         If Lambda.EvaluateLambda(c, lambdaString) = False Then Exit Function
     Next
     AllEvaluate = True
 End Function
 
 Public Function AnyEvaluate(lambdaString As String) As Boolean
     AnyEvaluate = True
-    Dim col As New Collection, c, lambda As New lambda
+    Dim col As New Collection, c, Lambda As New Lambda
     For Each c In items_
-         If lambda.EvaluateLambda(c, lambdaString) = True Then Exit Function
+         If Lambda.EvaluateLambda(c, lambdaString) = True Then Exit Function
     Next
     AnyEvaluate = False
 End Function
@@ -137,10 +136,10 @@ Public Function ToArray()
 End Function
 
 
-Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, lambda As String) As Collection
+Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, Lambda As String) As Collection
     Dim i As Long, j As Long, pivot As Variant, temp, Lam As Collection, col As Collection
     
-    Set Lam = colEx.SelectByLambda(lambda).Items
+    Set Lam = colEx.SelectByLambda(Lambda).Items
     Set col = colEx.Items
     i = low
     j = up
@@ -166,7 +165,7 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
         End If
     Loop
     Call colEx.Init(col)
-    If low < j Then QuickSort colEx, low, j, isAsc, lambda
-    If i < up Then QuickSort colEx, i, up, isAsc, lambda
+    If low < j Then QuickSort colEx, low, j, isAsc, Lambda
+    If i < up Then QuickSort colEx, i, up, isAsc, Lambda
     Set QuickSort = col
 End Function

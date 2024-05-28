@@ -8,16 +8,10 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-
-Private Const APP_NAME_EXCEL As String = "Microsoft Excel"
-Private Const APP_NAME_ACCESS As String = "Microsoft Access"
-
-Private app_ As Object
     
-    
+'try to simple calculation by not using Evaluate().
+
 Private Sub Class_Initialize()
-    If Application.name = APP_NAME_EXCEL Or Application.name = APP_NAME_ACCESS Then Else Debug.Print "This application is not supported Evaluate()/Eval()"
-    Set app_ = Application
 End Sub
 
 Public Function EvaluateLambda(val, str)
@@ -181,18 +175,51 @@ Private Function ProcessParentheses(var, varstr, inputStr As String) As String
     ProcessParentheses = currentContent
 End Function
 
-Private Function RunEvaluate(formulastr) As Variant
-    Dim res
-    If Application.name = APP_NAME_EXCEL Then
-        res = app_.Evaluate(formulastr)
-    ElseIf Application.name = APP_NAME_ACCESS Then
-        res = app_.Eval(formulastr)
-    Else
-        Err.Raise 9900, "Lambda.RunEvaluate()", "This application is not supported Evaluate()/Eval()"
-    End If
+Private Function RunEvaluate(nonBracketFormulaStr) As Variant
+    Dim res, str
+    str = Replace(nonBracketFormulaStr, " ", "")
+    res = SplitByOperator(str)
     RunEvaluate = res
 End Function
 
+Private Function SplitByOperator(str)
+    Dim c, i As Long, ope, o, arrOpeLfRg(0 To 2)
+    
+    ope = Array("<=", ">=", ">", "<", "=", "&", "+", "-", "*", "/")
+    
+    For Each o In ope
+        For i = 1 To Len(str)
+            If o = Mid(str, i, 1) Or o = Mid(str, i, 2) Then
+                arrOpeLfRg(0) = o
+                arrOpeLfRg(1) = Left(str, i - 1)
+                arrOpeLfRg(2) = Mid(str, i + Len(o))
+                
+                SplitByOperator = Calc(arrOpeLfRg(0), SplitByOperator(arrOpeLfRg(1)), SplitByOperator(arrOpeLfRg(2)))
+                Exit Function
+            End If
+        Next i
+    Next
+    If IsNumeric(str) Then SplitByOperator = val(str) Else SplitByOperator = str
+End Function
+
+Private Function Calc(ope, lf, rg)
+    If IsNumeric(lf) Then lf = val(lf)
+    If IsNumeric(rg) Then rg = val(rg)
+
+    Select Case ope
+        Case "<=": Calc = lf <= rg
+        Case ">=": Calc = lf >= rg
+        Case ">": Calc = lf > rg
+        Case "<": Calc = lf < rg
+        Case "=": Calc = lf = rg
+        Case "&": Calc = lf & rg
+        Case "+": Calc = lf + rg
+        Case "-": Calc = lf - rg
+        Case "*": Calc = lf * rg
+        Case "/": Calc = lf / rg
+    End Select
+
+End Function
 
 
 
