@@ -15,13 +15,13 @@ Expanding Collection's function.
 ~~~
 
  - No need to "Dim" and "New" for use (Predeclared) 
- - After initialization, run some function and output as Collection or something.
- -  Some functions can use tiny lambda & delegate string (using by Evaluate/Eval)
+ - After initialization, run some function and output as Collection or something
+ -  Some functions can use tiny lambda & delegate string
  
 ## Files
  - Can import your project
     - CollectionEx.cls
-    - Lambda.cls
+    - Lambda.cls (<- maybe delete in future)
  - For only sample
     - Sample.bas
     - Class1.cls
@@ -33,7 +33,7 @@ Expanding Collection's function.
 ## Japanese Note
 Collection を使う時に少しラクするためのクラス  
 最近コレクションをよく使うので、少し楽したいなと思ったので自作  
-LINQライクに出来るといいかなと思ったが、Evaluateだと限界を感じている。
+LINQライクに出来るといいかなと思ったが、まだ計算できないときがあるかも...
 
 <br>
 作成中
