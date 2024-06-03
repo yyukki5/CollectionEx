@@ -20,6 +20,7 @@ vbac.wsf
 # remove files for release
 UnitTest.cls
 UnitTests.bas
+Lambda.cls
 
 
 # User-specific files
