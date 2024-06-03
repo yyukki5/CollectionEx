@@ -7,18 +7,21 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+Attribute VB_Description = "Expanding Collection's function."
 Option Explicit
 
 Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.2.0 (developping)
+' Version: 0.3.0 (developping)
 ' Specification may be changed.
 ' -------------------------------------------
 
 
 Public Function Init(col) As CollectionEx
+Attribute Init.VB_Description = "Default Function"
+Attribute Init.VB_UserMemId = 0
     Set items_ = New Collection
     Set items_ = col
     Set Init = Me
@@ -52,16 +55,39 @@ Public Function SelectByLambda(lambdaString As String) As CollectionEx
     Set SelectByLambda = recol.Init(col)
 End Function
 
-Public Function Count() As Long
-    Count = items_.Count
+Public Function Count(Optional lambdaString As String) As Long
+    If lambdaString = "" Then Count = items_.Count: Exit Function
+    Dim col As New Collection, c, Lambda As New Lambda
+    For Each c In items_
+        If Lambda.EvaluateLambda(c, lambdaString) Then col.Add c
+    Next
+    Count = col.Count
+End Function
+
+Public Function Add(collectionItem, Optional Key As String) As CollectionEx
+    If Key = "" Then items_.Add collectionItem Else items_.Add collectionItem, Key
+    Set Add = Me
+End Function
+
+Public Function AddRange(coll As Collection) As CollectionEx
+    Dim c
+    For Each c In coll
+        items_.Add c
+    Next
+    Set AddRange = Me
+End Function
+
+Public Function Remove(index) As CollectionEx
+    items_.Remove (index)
+    Set Remove = Me
 End Function
 
 Public Function FirstOrDefault()
-    If Count = 0 Then Set FirstOrDefault = Nothing Else If IsItemTypeObject Then Set FirstOrDefault = items_.Item(1) Else FirstOrDefault = items_.Item(1)
+    If items_.Count = 0 Then Set FirstOrDefault = Nothing Else If IsItemTypeObject Then Set FirstOrDefault = items_.Item(1) Else FirstOrDefault = items_.Item(1)
 End Function
 
 Public Function LastOrDefault()
-    If Count = 0 Then Set LastOrDefault = Nothing Else If IsItemTypeObject Then Set LastOrDefault = items_.Item(items_.Count) Else LastOrDefault = items_.Item(items_.Count)
+    If items_.Count = 0 Then Set LastOrDefault = Nothing Else If IsItemTypeObject Then Set LastOrDefault = items_.Item(items_.Count) Else LastOrDefault = items_.Item(items_.Count)
 End Function
 
 Public Function Skip(skipIndex As Long) As CollectionEx
@@ -110,7 +136,7 @@ Public Function Sum() As Double
 End Function
 
 Public Function Average() As Double
-    Average = Sum / Count
+    Average = Sum / items_.Count
 End Function
 
 Public Function Orderby(lambdaString As String) As CollectionEx
