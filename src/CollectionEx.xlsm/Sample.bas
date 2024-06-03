@@ -11,7 +11,7 @@ Sub SampleCode()
     Next
     
     Dim res
-    res = CollectionEx.Init(col) _
+    res = CollectionEx(col) _
         .WhereByEvaluatedLambda("x=>x.abc<7") _
         .OrderByDescending("x=>x.abc") _
         .Take(3) _
