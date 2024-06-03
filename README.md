@@ -4,7 +4,7 @@ Expanding Collection's function.
 
 ## How to use
 ~~~
-    res1 = CollectionEx.Init(col) _
+    res1 = CollectionEx(col) _
         .WhereByEvaluatedLambda("x=>x.abc<7") _
         .OrderByDescending("x=>x.abc") _
         .Take(3) _
@@ -14,14 +14,14 @@ Expanding Collection's function.
     set res2 = CollectionEx.Init(col).Take(3).Items
 ~~~
 
- - No need to "Dim" and "New" for use (Predeclared) 
+ - No need to "Dim" and "New" for use, and initialized as default function (Predeclared/UserMemberId0) 
  - After initialization, run some function and output as Collection or something
- -  Some functions can use tiny lambda & delegate string
+ -  Some functions can use "lambda string" (Simply implemented anonymous function by string)
  
 ## Files
- - Can import your project
+ - Can import these files to your project
     - CollectionEx.cls
-    - Lambda.cls (<- maybe delete in future)
+    - Lambda.cls (<- see [Lambda Repository](https://github.com/yyukki5/Lambda) )
  - For only sample
     - Sample.bas
     - Class1.cls
@@ -33,7 +33,8 @@ Expanding Collection's function.
 ## Japanese Note
 Collection を使う時に少しラクするためのクラス  
 最近コレクションをよく使うので、少し楽したいなと思ったので自作  
-LINQライクに出来るといいかなと思ったが、まだ計算できないときがあるかも...
+LINQライクに出来るといいかなと思ったが、まだ計算できないときがあるかも...  
+→ Lambda.clsは別Repositoryで作ることにしました
 
 <br>
 作成中
