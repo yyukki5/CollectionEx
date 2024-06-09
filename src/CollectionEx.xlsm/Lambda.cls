@@ -196,14 +196,17 @@ Private Function RunEvaluate(nonBracketFormulaStr) As Variant
     RunEvaluate = res
 End Function
 
+
 Private Function SplitByOperator(str)
     Dim c, i As Long, ope, o, arrOpeLfRg(0 To 2)
     
-    ope = Array("<=", ">=", ">", "<", "=", "&", "+", "-", "*", "/")
+    ope = Array(" Imp ", " Eqv ", " Xor ", " Or ", " And ", " Not ", _
+                " Is ", " Like ", "<=", ">=", ">", "<", "<>", "=", _
+                "&", "+", "-", " Mod ", "\", "*", "/", " ^ ")
     
     For Each o In ope
         For i = 1 To Len(str)
-            If o = Mid(str, i, 1) Or o = Mid(str, i, 2) Then
+            If o = Mid(str, i, 1) Or o = Mid(str, i, 2) Or o = Mid(str, i, 3) Or o = Mid(str, i, 4) Or o = Mid(str, i, 5) Or o = Mid(str, i, 6) Then
                 arrOpeLfRg(0) = o
                 arrOpeLfRg(1) = Left(str, i - 1)
                 arrOpeLfRg(2) = Mid(str, i + Len(o))
@@ -220,19 +223,34 @@ Private Function Calc(ope, lf, rg)
     If IsNumeric(lf) Then lf = val(lf)
     If IsNumeric(rg) Then rg = val(rg)
 
+On Error GoTo errCalc
     Select Case ope
         Case "<=": Calc = lf <= rg
         Case ">=": Calc = lf >= rg
         Case ">": Calc = lf > rg
         Case "<": Calc = lf < rg
+        Case "<>": Calc = lf <> rg
         Case "=": Calc = lf = rg
         Case "&": Calc = lf & rg
         Case "+": Calc = lf + rg
         Case "-": Calc = lf - rg
         Case "*": Calc = lf * rg
         Case "/": Calc = lf / rg
+        Case "\": Calc = lf \ rg
+        Case " ^ ": Calc = lf ^ rg
+        Case " Mod ": Calc = lf Mod rg
+        Case " Imp ": Calc = lf Imp rg
+        Case " Eqv ": Calc = lf Eqv rg
+        Case " Xor ": Calc = lf Xor rg
+        Case " Or ": Calc = lf Or rg
+        Case " And ": Calc = lf And rg
+        Case " Not ": Calc = Not lf
+        Case " Like ": Calc = lf Like rg
+        Case " Is ": Calc = lf Is rg
     End Select
-
+    Exit Function
+errCalc:
+    Err.Raise 9001, "Lambda.Calc()", "formula string has error : " & lf & " " & ope & " " & rg
 End Function
 
 
