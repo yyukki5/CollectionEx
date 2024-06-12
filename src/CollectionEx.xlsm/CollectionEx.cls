@@ -42,7 +42,7 @@ End Property
 Public Function WhereByEvaluatedLambda(lambdaString As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula, Lambda As New Lambda
     For Each c In items_
-        If Lambda.EvaluateLambda(c, lambdaString) Then col.Add c
+        If Lambda(c, lambdaString) Then col.Add c
     Next
     Set WhereByEvaluatedLambda = recol.Init(col)
 End Function
@@ -50,7 +50,7 @@ End Function
 Public Function SelectByLambda(lambdaString As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, Lambda As New Lambda
     For Each c In items_
-        col.Add Lambda.SelectLambdaValue(c, lambdaString)
+        col.Add Lambda(c, lambdaString)
     Next
     Set SelectByLambda = recol.Init(col)
 End Function
@@ -59,7 +59,7 @@ Public Function Count(Optional lambdaString As String) As Long
     If lambdaString = "" Then Count = items_.Count: Exit Function
     Dim col As New Collection, c, Lambda As New Lambda
     For Each c In items_
-        If Lambda.EvaluateLambda(c, lambdaString) Then col.Add c
+        If Lambda(c, lambdaString) Then col.Add c
     Next
     Count = col.Count
 End Function
@@ -112,7 +112,7 @@ Public Function AllEvaluate(lambdaString As String) As Boolean
     AllEvaluate = False
     Dim col As New Collection, c, recol As New CollectionEx, Lambda As New Lambda
     For Each c In items_
-         If Lambda.EvaluateLambda(c, lambdaString) = False Then Exit Function
+         If Lambda(c, lambdaString) = False Then Exit Function
     Next
     AllEvaluate = True
 End Function
@@ -121,7 +121,7 @@ Public Function AnyEvaluate(lambdaString As String) As Boolean
     AnyEvaluate = True
     Dim col As New Collection, c, Lambda As New Lambda
     For Each c In items_
-         If Lambda.EvaluateLambda(c, lambdaString) = True Then Exit Function
+         If Lambda(c, lambdaString) = True Then Exit Function
     Next
     AnyEvaluate = False
 End Function
@@ -195,3 +195,6 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
     If i < up Then QuickSort colEx, i, up, isAsc, Lambda
     Set QuickSort = col
 End Function
+
+
+
