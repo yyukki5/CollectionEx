@@ -61,8 +61,8 @@ Public Function Count(Optional lambdaString As String) As Long
     Count = col.Count
 End Function
 
-Public Function Add(collectionItem, Optional Key As String) As CollectionEx
-    If Key = "" Then items_.Add collectionItem Else items_.Add collectionItem, Key
+Public Function Add(addedItem, Optional Key As String) As CollectionEx
+    If Key = "" Then items_.Add addedItem Else items_.Add addedItem, Key
     Set Add = Me
 End Function
 
@@ -181,16 +181,18 @@ Public Function ToArray()
     ReDim arr(0 To items_.Count - 1)
     
     For i = LBound(arr) To UBound(arr)
-        If IsItemTypeObject Then Set arr(i) = items_.Item(i + 1) Else Let arr(i) = items_.Item(i + 1)
+        SetObjectAsBuffer Items.Item(i + 1), arr(i)
     Next i
     ToArray = arr
 End Function
 
 
-Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, Lambda As String) As Collection
+
+' private functions --------------------------------
+Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, lambdaString As String) As Collection
     Dim i As Long, j As Long, pivot As Variant, temp, Lam As Collection, col As Collection
     
-    Set Lam = colEx.SelectByLambda(Lambda).Items
+    Set Lam = colEx.SelectBy(lambdaString).Items
     Set col = colEx.Items
     i = low
     j = up
@@ -216,8 +218,8 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
         End If
     Loop
     Call colEx.Init(col)
-    If low < j Then QuickSort colEx, low, j, isAsc, Lambda
-    If i < up Then QuickSort colEx, i, up, isAsc, Lambda
+    If low < j Then QuickSort colEx, low, j, isAsc, lambdaString
+    If i < up Then QuickSort colEx, i, up, isAsc, lambdaString
     Set QuickSort = col
 End Function
 
