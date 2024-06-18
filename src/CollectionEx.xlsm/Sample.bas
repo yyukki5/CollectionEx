@@ -12,10 +12,10 @@ Sub SampleCode()
     
     Dim res
     res = CollectionEx(col) _
-        .WhereByEvaluatedLambda("x=>x.abc<7") _
+        .Where("x=>x.abc<7") _
         .OrderByDescending("x=>x.abc") _
         .Take(3) _
-        .SelectByLambda("x=>x.abc") _
+        .SelectBy("x=>x.abc") _
         .ToArray
             
     For i = LBound(res) To UBound(res)
