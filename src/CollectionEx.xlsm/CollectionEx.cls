@@ -123,22 +123,23 @@ Public Function Take(takeIndex As Long) As CollectionEx
     Set Take = recol.Init(col)
 End Function
 
-Public Function AllEvaluate(lambdaString As String) As Boolean
-    AllEvaluate = False
-    Dim col As New Collection, c, recol As New CollectionEx, Lambda As New Lambda
+Public Function AllBy(lambdaString As String) As Boolean
+    Dim col As New Collection, c
+    AllBy = False
     For Each c In items_
          If Lambda(c, lambdaString) = False Then Exit Function
     Next
-    AllEvaluate = True
+    AllBy = True
 End Function
 
-Public Function AnyEvaluate(lambdaString As String) As Boolean
-    AnyEvaluate = True
-    Dim col As New Collection, c, Lambda As New Lambda
+Public Function AnyBy(lambdaString As String) As Boolean
+    Dim col As New Collection, c
+    AnyBy = True
     For Each c In items_
          If Lambda(c, lambdaString) = True Then Exit Function
     Next
-    AnyEvaluate = False
+    AnyBy = False
+End Function
 End Function
 
 Public Function Sum() As Double
