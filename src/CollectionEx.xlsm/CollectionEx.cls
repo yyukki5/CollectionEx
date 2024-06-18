@@ -79,12 +79,30 @@ Public Function Remove(index) As CollectionEx
     Set Remove = Me
 End Function
 
-Public Function FirstOrDefault()
-    If items_.Count = 0 Then Set FirstOrDefault = Nothing Else If IsItemTypeObject Then Set FirstOrDefault = items_.Item(1) Else FirstOrDefault = items_.Item(1)
+Public Function FirstOrDefault(Optional lambdaString As String)
+    Dim col As New Collection, c
+    
+    If items_.Count = 0 Then FirstOrDefault = Null: Exit Function
+    If lambdaString <> "" Then
+        Set col = Where(lambdaString).Items
+    Else
+        Set col = items_
+    End If
+    
+    If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
 End Function
 
-Public Function LastOrDefault()
-    If items_.Count = 0 Then Set LastOrDefault = Nothing Else If IsItemTypeObject Then Set LastOrDefault = items_.Item(items_.Count) Else LastOrDefault = items_.Item(items_.Count)
+Public Function LastOrDefault(Optional lambdaString As String)
+    Dim col As New Collection, c
+    
+    If items_.Count = 0 Then LastOrDefault = Null: Exit Function
+    If lambdaString <> "" Then
+        Set col = Where(lambdaString).Items
+    Else
+        Set col = items_
+    End If
+    
+    If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
 End Function
 
 Public Function Skip(skipIndex As Long) As CollectionEx
@@ -204,3 +222,12 @@ Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) A
     End If
 End Function
 
+Private Function GetDefaultValue()
+    If items_.Count = 0 Then
+        GetDefaultValue = Null
+    ElseIf IsObject(Item) Then
+        Set GetDefaultValue = Nothing
+    Else
+        GetDefaultValue = Null
+    End If
+End Function
