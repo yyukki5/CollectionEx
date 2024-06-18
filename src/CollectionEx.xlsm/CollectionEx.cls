@@ -39,12 +39,12 @@ Private Property Get IsItemTypeObject() As Boolean
     IsItemTypeObject = IsObject(items_(1))
 End Property
 
-Public Function WhereByEvaluatedLambda(lambdaString As String) As CollectionEx
+Public Function Where(lambdaString As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula, Lambda As New Lambda
     For Each c In items_
         If Lambda(c, lambdaString) Then col.Add c
     Next
-    Set WhereByEvaluatedLambda = recol.Init(col)
+    Set Where = recol.Init(col)
 End Function
 
 Public Function SelectByLambda(lambdaString As String) As CollectionEx
