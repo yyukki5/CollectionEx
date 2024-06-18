@@ -32,12 +32,9 @@ Public Property Get Items() As Collection
 End Property
 
 Public Property Get Item(Optional index As Long = 1)
-    If IsItemTypeObject Then Set Item = items_.Item(index) Else Item = items_.Item(index)
+    SetObjectAsBuffer items_.Item(index), Item
 End Property
 
-Private Property Get IsItemTypeObject() As Boolean
-    IsItemTypeObject = IsObject(items_(1))
-End Property
 
 Public Function Where(lambdaString As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula, Lambda As New Lambda
@@ -197,4 +194,13 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
 End Function
 
 
+Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
+    If IsObject(unverified_value) Then
+        Set buffer_value = unverified_value
+        SetObjectAsBuffer = True
+    Else
+        Let buffer_value = unverified_value
+        SetObjectAsBuffer = False
+    End If
+End Function
 
