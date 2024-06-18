@@ -47,12 +47,12 @@ Public Function Where(lambdaString As String) As CollectionEx
     Set Where = recol.Init(col)
 End Function
 
-Public Function SelectByLambda(lambdaString As String) As CollectionEx
+Public Function SelectBy(lambdaString As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, Lambda As New Lambda
     For Each c In items_
         col.Add Lambda(c, lambdaString)
     Next
-    Set SelectByLambda = recol.Init(col)
+    Set SelectBy = recol.Init(col)
 End Function
 
 Public Function Count(Optional lambdaString As String) As Long
