@@ -161,8 +161,12 @@ Public Function Sum() As Double
     Sum = val
 End Function
 
-Public Function Average() As Double
+Public Function Average()
+    If items_.Count = 0 Then Average = Null : Exit Function
+
     Average = Sum / items_.Count
+End Function
+
 Public Function Max() As Double
     Dim c, tmp
     If items_.Count = 0 Then Max = Null : Exit Function
