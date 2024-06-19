@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.4.0 (developping)
+' Version: 0.5.0 (developping)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
