@@ -173,6 +173,14 @@ Public Function Max() As Double
     Max = tmp
 End Function
 
+Public Function Min() As Double
+    Dim c, tmp
+    If items_.Count = 0 Then Min = Null : Exit Function
+    tmp = Item
+    For Each c In items_
+        tmp = IIf(c < tmp, c, tmp)
+    Next
+    Min = tmp
 End Function
 
 Public Function Orderby(lambdaString As String) As CollectionEx
