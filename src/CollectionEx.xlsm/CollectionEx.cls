@@ -153,7 +153,7 @@ End Function
 
 Public Function Sum() As Double
     Dim col As New Collection, c, val
-    If items_.Count Then Sum = 0: Exit Function
+    If items_.Count = 0 Then Sum = 0 : Exit Function
     If IsNumeric(Item) = False Then Err.Raise 9001, , Err.Description
     For Each c In items_
          val = val + c
