@@ -80,29 +80,32 @@ Public Function Remove(index) As CollectionEx
     Set Remove = Me
 End Function
 
+Public Function First(Optional lambdaString As String)
+    Dim col As Collection
+    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items")
+    
+    Set col = FirstLastCore(lambdaString)
+    If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items") Else Call SetObjectAsBuffer(col.Item(1), First)
+End Function
+    
 Public Function FirstOrDefault(Optional lambdaString As String)
-    Dim col As New Collection, c
-    
-    If items_.Count = 0 Then FirstOrDefault = Null: Exit Function
-    If lambdaString <> "" Then
-        Set col = Where(lambdaString).Items
-    Else
-        Set col = items_
-    End If
-    
+    Dim col As Collection
+    If items_.Count = 0 Then FirstOrDefault = Null : Exit Function
+    Set col = FirstLastCore(lambdaString)
     If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
 End Function
 
+Public Function Last(Optional lambdaString As String)
+    Dim col As Collection
+    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items")
+    Set col = FirstLastCore(lambdaString)
+    If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items") Else Call SetObjectAsBuffer(col.Item(col.Count), Last)
+End Function
+
 Public Function LastOrDefault(Optional lambdaString As String)
-    Dim col As New Collection, c
-    
-    If items_.Count = 0 Then LastOrDefault = Null: Exit Function
-    If lambdaString <> "" Then
-        Set col = Where(lambdaString).Items
-    Else
-        Set col = items_
-    End If
-    
+    Dim col As Collection
+    If items_.Count = 0 Then LastOrDefault = Null : Exit Function
+    Set col = FirstLastCore(lambdaString)
     If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
 End Function
 
@@ -246,6 +249,11 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
     Set QuickSort = col
 End Function
 
+Private Function FirstLastCore(lambdaString As String)
+    Dim col As New Collection
+    If lambdaString <> "" Then Set col = Where(lambdaString).Items Else Set col = items_
+    Set FirstLastCore = col
+End Function
 
 Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
     If IsObject(unverified_value) Then
