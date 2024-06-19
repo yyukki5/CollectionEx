@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.4.0 (developping)
+' Version: 0.5.0 (developping)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
@@ -80,29 +80,32 @@ Public Function Remove(index) As CollectionEx
     Set Remove = Me
 End Function
 
+Public Function First(Optional lambdaString As String)
+    Dim col As Collection
+    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items")
+    
+    Set col = FirstLastCore(lambdaString)
+    If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items") Else Call SetObjectAsBuffer(col.Item(1), First)
+End Function
+    
 Public Function FirstOrDefault(Optional lambdaString As String)
-    Dim col As New Collection, c
-    
-    If items_.Count = 0 Then FirstOrDefault = Null: Exit Function
-    If lambdaString <> "" Then
-        Set col = Where(lambdaString).Items
-    Else
-        Set col = items_
-    End If
-    
+    Dim col As Collection
+    If items_.Count = 0 Then FirstOrDefault = Null : Exit Function
+    Set col = FirstLastCore(lambdaString)
     If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
 End Function
 
+Public Function Last(Optional lambdaString As String)
+    Dim col As Collection
+    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items")
+    Set col = FirstLastCore(lambdaString)
+    If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items") Else Call SetObjectAsBuffer(col.Item(col.Count), Last)
+End Function
+
 Public Function LastOrDefault(Optional lambdaString As String)
-    Dim col As New Collection, c
-    
-    If items_.Count = 0 Then LastOrDefault = Null: Exit Function
-    If lambdaString <> "" Then
-        Set col = Where(lambdaString).Items
-    Else
-        Set col = items_
-    End If
-    
+    Dim col As Collection
+    If items_.Count = 0 Then LastOrDefault = Null : Exit Function
+    Set col = FirstLastCore(lambdaString)
     If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
 End Function
 
@@ -153,7 +156,7 @@ End Function
 
 Public Function Sum() As Double
     Dim col As New Collection, c, val
-    If items_.Count Then Sum = 0: Exit Function
+    If items_.Count = 0 Then Sum = 0 : Exit Function
     If IsNumeric(Item) = False Then Err.Raise 9001, , Err.Description
     For Each c In items_
          val = val + c
@@ -161,8 +164,30 @@ Public Function Sum() As Double
     Sum = val
 End Function
 
-Public Function Average() As Double
+Public Function Average()
+    If items_.Count = 0 Then Average = Null : Exit Function
+
     Average = Sum / items_.Count
+End Function
+
+Public Function Max() As Double
+    Dim c, tmp
+    If items_.Count = 0 Then Max = Null : Exit Function
+    tmp = Item
+    For Each c In items_
+        tmp = IIf(c > tmp, c, tmp)
+    Next
+    Max = tmp
+End Function
+
+Public Function Min() As Double
+    Dim c, tmp
+    If items_.Count = 0 Then Min = Null : Exit Function
+    tmp = Item
+    For Each c In items_
+        tmp = IIf(c < tmp, c, tmp)
+    Next
+    Min = tmp
 End Function
 
 Public Function Orderby(lambdaString As String) As CollectionEx
@@ -224,6 +249,11 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
     Set QuickSort = col
 End Function
 
+Private Function FirstLastCore(lambdaString As String)
+    Dim col As New Collection
+    If lambdaString <> "" Then Set col = Where(lambdaString).Items Else Set col = items_
+    Set FirstLastCore = col
+End Function
 
 Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
     If IsObject(unverified_value) Then
