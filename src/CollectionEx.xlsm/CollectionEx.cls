@@ -163,6 +163,16 @@ End Function
 
 Public Function Average() As Double
     Average = Sum / items_.Count
+Public Function Max() As Double
+    Dim c, tmp
+    If items_.Count = 0 Then Max = Null : Exit Function
+    tmp = Item
+    For Each c In items_
+        tmp = IIf(c > tmp, c, tmp)
+    Next
+    Max = tmp
+End Function
+
 End Function
 
 Public Function Orderby(lambdaString As String) As CollectionEx
