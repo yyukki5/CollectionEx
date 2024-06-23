@@ -38,26 +38,26 @@ End Property
 
 
 Public Function Where(lambdaString As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula, Lambda As New Lambda
+    Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula
     For Each c In items_
-        If Lambda(c, lambdaString) Then col.Add c
+        If Lambda(c, lambdaString).Evaluate Then col.Add c
     Next
     Set Where = recol.Init(col)
 End Function
 
 Public Function SelectBy(lambdaString As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, Lambda As New Lambda
+    Dim col As New Collection, c, recol As New CollectionEx
     For Each c In items_
-        col.Add Lambda(c, lambdaString)
+        col.Add Lambda(c, lambdaString).Evaluate
     Next
     Set SelectBy = recol.Init(col)
 End Function
 
 Public Function Count(Optional lambdaString As String) As Long
     If lambdaString = "" Then Count = items_.Count: Exit Function
-    Dim col As New Collection, c, Lambda As New Lambda
+    Dim col As New Collection, c
     For Each c In items_
-        If Lambda(c, lambdaString) Then col.Add c
+        If Lambda(c, lambdaString).Evaluate Then col.Add c
     Next
     Count = col.Count
 End Function
@@ -90,7 +90,7 @@ End Function
     
 Public Function FirstOrDefault(Optional lambdaString As String)
     Dim col As Collection
-    If items_.Count = 0 Then FirstOrDefault = Null : Exit Function
+    If items_.Count = 0 Then FirstOrDefault = Null: Exit Function
     Set col = FirstLastCore(lambdaString)
     If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
 End Function
@@ -104,7 +104,7 @@ End Function
 
 Public Function LastOrDefault(Optional lambdaString As String)
     Dim col As Collection
-    If items_.Count = 0 Then LastOrDefault = Null : Exit Function
+    If items_.Count = 0 Then LastOrDefault = Null: Exit Function
     Set col = FirstLastCore(lambdaString)
     If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
 End Function
@@ -131,7 +131,7 @@ Public Function AllBy(lambdaString As String) As Boolean
     Dim col As New Collection, c
     AllBy = False
     For Each c In items_
-         If Lambda(c, lambdaString) = False Then Exit Function
+         If Lambda(c, lambdaString).Evaluate = False Then Exit Function
     Next
     AllBy = True
 End Function
@@ -140,7 +140,7 @@ Public Function AnyBy(lambdaString As String) As Boolean
     Dim col As New Collection, c
     AnyBy = True
     For Each c In items_
-         If Lambda(c, lambdaString) = True Then Exit Function
+         If Lambda(c, lambdaString).Evaluate = True Then Exit Function
     Next
     AnyBy = False
 End Function
@@ -156,7 +156,7 @@ End Function
 
 Public Function Sum() As Double
     Dim col As New Collection, c, val
-    If items_.Count = 0 Then Sum = 0 : Exit Function
+    If items_.Count = 0 Then Sum = 0: Exit Function
     If IsNumeric(Item) = False Then Err.Raise 9001, , Err.Description
     For Each c In items_
          val = val + c
@@ -165,14 +165,14 @@ Public Function Sum() As Double
 End Function
 
 Public Function Average()
-    If items_.Count = 0 Then Average = Null : Exit Function
+    If items_.Count = 0 Then Average = Null: Exit Function
 
     Average = Sum / items_.Count
 End Function
 
 Public Function Max() As Double
     Dim c, tmp
-    If items_.Count = 0 Then Max = Null : Exit Function
+    If items_.Count = 0 Then Max = Null: Exit Function
     tmp = Item
     For Each c In items_
         tmp = IIf(c > tmp, c, tmp)
@@ -182,7 +182,7 @@ End Function
 
 Public Function Min() As Double
     Dim c, tmp
-    If items_.Count = 0 Then Min = Null : Exit Function
+    If items_.Count = 0 Then Min = Null: Exit Function
     tmp = Item
     For Each c In items_
         tmp = IIf(c < tmp, c, tmp)
