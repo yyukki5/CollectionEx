@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.5.0 (developping)
+' Version: 0.6.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
@@ -227,11 +227,15 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
     
     Do While i <= j
         If isAsc Then
-            Do While Lam(i) < pivot: i = i + 1: Loop
-            Do While Lam(j) > pivot: j = j - 1: Loop
+            Do While Lam(i) < pivot : i = i + 1 : If i > up Then Exit Do : 
+            Loop
+            Do While Lam(j) > pivot : j = j - 1 : If j < low Then Exit Do : 
+            Loop
         Else
-            Do While Lam(i) > pivot: i = i + 1: Loop
-            Do While Lam(j) < pivot: j = j - 1: Loop
+            Do While Lam(i) > pivot : i = i + 1 : If i > up Then Exit Do : 
+            Loop
+            Do While Lam(j) < pivot : j = j - 1 : If j < low Then Exit Do : 
+            Loop
         End If
         If i <= j Then
 
@@ -247,7 +251,7 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
     Call colEx.Init(col)
     If low < j Then QuickSort colEx, low, j, isAsc, lambdaString
     If i < up Then QuickSort colEx, i, up, isAsc, lambdaString
-    Set QuickSort = col
+    Set QuickSort = colEx.Items
 End Function
 
 Private Function FirstLastCore(lambdaString As String)
