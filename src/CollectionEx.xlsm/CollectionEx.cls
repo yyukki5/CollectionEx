@@ -20,10 +20,11 @@ Private items_ As Collection
 ' -------------------------------------------
 
 
-Public Function Init(col) As CollectionEx
+Public Function Init(enumVariant) As CollectionEx
 Attribute Init.VB_Description = "Default Function"
 Attribute Init.VB_UserMemId = 0
-    Set items_ = New Collection
+    Dim col As Collection, c :  Set col = New Collection
+    For Each c In enumVariant : col.Add c: Next
     Set items_ = col
     Set Init = Me
 End Function
@@ -155,7 +156,7 @@ Public Function Contains(var) As Boolean
 End Function
 
 Public Function Sum() As Double
-    Dim col As New Collection, c, val
+    Dim c, val As Double
     If items_.Count = 0 Then Sum = 0: Exit Function
     If IsNumeric(Item) = False Then Err.Raise 9001, , Err.Description
     For Each c In items_
@@ -164,13 +165,13 @@ Public Function Sum() As Double
     Sum = val
 End Function
 
-Public Function Average()
+Public Function Average() As Variant
     If items_.Count = 0 Then Average = Null: Exit Function
 
     Average = Sum / items_.Count
 End Function
 
-Public Function Max() As Double
+Public Function Max() As Variant
     Dim c, tmp
     If items_.Count = 0 Then Max = Null: Exit Function
     tmp = Item
@@ -180,7 +181,7 @@ Public Function Max() As Double
     Max = tmp
 End Function
 
-Public Function Min() As Double
+Public Function Min() As Variant
     Dim c, tmp
     If items_.Count = 0 Then Min = Null: Exit Function
     tmp = Item
@@ -250,7 +251,7 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
 End Function
 
 Private Function FirstLastCore(lambdaString As String)
-    Dim col As New Collection
+    Dim col As Collection
     If lambdaString <> "" Then Set col = Where(lambdaString).Items Else Set col = items_
     Set FirstLastCore = col
 End Function
