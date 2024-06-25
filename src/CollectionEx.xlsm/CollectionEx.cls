@@ -20,10 +20,11 @@ Private items_ As Collection
 ' -------------------------------------------
 
 
-Public Function Init(col) As CollectionEx
+Public Function Init(enumVariant) As CollectionEx
 Attribute Init.VB_Description = "Default Function"
 Attribute Init.VB_UserMemId = 0
-    Set items_ = New Collection
+    Dim col As Collection, c :  Set col = New Collection
+    For Each c In enumVariant : col.Add c: Next
     Set items_ = col
     Set Init = Me
 End Function
