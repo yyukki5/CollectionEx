@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.6.0 (developing)
+' Version: 0.7.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
@@ -23,8 +23,8 @@ Private items_ As Collection
 Public Function Init(enumVariant) As CollectionEx
 Attribute Init.VB_Description = "Default Function"
 Attribute Init.VB_UserMemId = 0
-    Dim col As Collection, c :  Set col = New Collection
-    For Each c In enumVariant : col.Add c: Next
+    Dim col As Collection, c: Set col = New Collection
+    For Each c In enumVariant: col.Add c: Next
     Set items_ = col
     Set Init = Me
 End Function
@@ -39,9 +39,9 @@ End Property
 
 
 Public Function Where(lambdaString As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, v, evaluatedFormula
+    Dim col As New Collection, c, recol As New CollectionEx
     For Each c In items_
-        If Lambda(c, lambdaString).Evaluate Then col.Add c
+        If Lambda(c, lambdaString).Evaluate = True Then col.Add c
     Next
     Set Where = recol.Init(col)
 End Function
@@ -227,14 +227,14 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
     
     Do While i <= j
         If isAsc Then
-            Do While Lam(i) < pivot : i = i + 1 : If i > up Then Exit Do : 
+            Do While Lam(i) < pivot: i = i + 1: If i > up Then Exit Do:
             Loop
-            Do While Lam(j) > pivot : j = j - 1 : If j < low Then Exit Do : 
+            Do While Lam(j) > pivot: j = j - 1: If j < low Then Exit Do:
             Loop
         Else
-            Do While Lam(i) > pivot : i = i + 1 : If i > up Then Exit Do : 
+            Do While Lam(i) > pivot: i = i + 1: If i > up Then Exit Do:
             Loop
-            Do While Lam(j) < pivot : j = j - 1 : If j < low Then Exit Do : 
+            Do While Lam(j) < pivot: j = j - 1: If j < low Then Exit Do:
             Loop
         End If
         If i <= j Then
