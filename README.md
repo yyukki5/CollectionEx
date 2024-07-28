@@ -8,7 +8,7 @@ Expanding Collection's function.
         .Where("x=>x.abc<7") _
         .OrderByDescending("x=>x.abc") _
         .Take(3) _
-        .SelectByLambda("x=>x.abc") _
+        .SelectBy("x=>x.abc") _
         .ToArray
     
     set res2 = CollectionEx.Init(col).Take(3).Items
@@ -21,7 +21,7 @@ Expanding Collection's function.
 ## Files
  - Can import these files to your VBA project
     - CollectionEx.cls
-    - Lambda.cls (<- see [Lambda Repository](https://github.com/yyukki5/Lambda) )
+    - Lambda.cls (<- see [Lambda Repository](https://github.com/yyukki5/Lambda)  (Ver.0.6.0))
  - For only sample
     - Sample.bas
     - Class1.cls
