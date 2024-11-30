@@ -9,7 +9,7 @@ Sub SampleCode()
         Set cls1 = New Class1
         col.Add cls1.Init(i)
     Next
-    
+        
     Dim res
     res = CollectionEx(col) _
         .Where("x=>x.abc<7") _
