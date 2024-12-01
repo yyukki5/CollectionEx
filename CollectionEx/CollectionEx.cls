@@ -89,11 +89,11 @@ Public Function First(Optional lambdaString As String)
     If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items") Else Call SetObjectAsBuffer(col.Item(1), First)
 End Function
     
-Public Function FirstOrDefault(Optional lambdaString As String)
+Public Function FirstOrDefault(Optional lambdaString As String, Optional default_value As Variant = Null)
     Dim col As Collection
-    If items_.Count = 0 Then FirstOrDefault = Null: Exit Function
+    If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, FirstOrDefault): Exit Function
     Set col = FirstLastCore(lambdaString)
-    If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
+    If col.Count = 0 Then Call SetObjectAsBuffer(default_value, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
 End Function
 
 Public Function Last(Optional lambdaString As String)
@@ -103,11 +103,11 @@ Public Function Last(Optional lambdaString As String)
     If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items") Else Call SetObjectAsBuffer(col.Item(col.Count), Last)
 End Function
 
-Public Function LastOrDefault(Optional lambdaString As String)
+Public Function LastOrDefault(Optional lambdaString As String, Optional default_value As Variant = Null)
     Dim col As Collection
-    If items_.Count = 0 Then LastOrDefault = Null: Exit Function
+    If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault): Exit Function
     Set col = FirstLastCore(lambdaString)
-    If col.Count = 0 Then Call SetObjectAsBuffer(GetDefaultValue, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
+    If col.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
 End Function
 
 Public Function Skip(skipIndex As Long) As CollectionEx

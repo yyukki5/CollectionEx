@@ -6,9 +6,7 @@
 
 # not using
 .vs/
-bin/*
-bin/old/
-bin/backup/
+*/bin/*
 src/*.accdb/*
 src/*.docm/*
 vbac.wsf
@@ -21,6 +19,7 @@ vbac.wsf
 UnitTest.cls
 UnitTests.bas
 Lambda.cls
+DevTools.cls
 
 
 # User-specific files

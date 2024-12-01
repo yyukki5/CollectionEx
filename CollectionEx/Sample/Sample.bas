@@ -1,4 +1,5 @@
 Attribute VB_Name = "Sample"
+'<dir .\Sample /dir>
 Option Explicit
 
 Sub SampleCode()
