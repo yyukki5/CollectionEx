@@ -17,7 +17,12 @@ Expanding Collection's function.
 ## Features
  - No need to write "Dim" and "New" for use.  class is predeclared, and can initialize by class name as default function. 
  - After initialization, run some function and output as Collection or something
- -  Some functions can use "lambda string" (Simply implemented anonymous function by string)
+ -  Some functions can use "lambda string" (Simply implemented anonymous function by string) 
+
+ 
+<br>
+ * Specification may be changed until version 1.0.0.  
+
  
 ## Files
  - Can import these files to your VBA project
@@ -28,8 +33,7 @@ Expanding Collection's function.
     - Class1.cls
     - Class2.cls
 
-<br>
- * Specification may be changed until version 1.0.0.
+
 
 ## Japanese Note
 Collection を使う時に少しラクするためのクラス  
@@ -71,10 +75,16 @@ Simply CollectionEx
     - AnyBy(), AllBy()
     - Take(), Skip()
 
+<br>
+ * Specification may be changed until version 1.0.0.  
+
 
 ## Japanese Note
-CollectionEx を簡略化、軽量化したもの。  
+CollectionEx を簡略化、軽量化したもの。（Lambda を使っていない）  
 
 要素の直下のプロパティを使ってWhereしたり、Selectしたり出来る。  
 2階層以降のプロパティにはアクセスできないので For Each を使う。  
 デフォルトメソッドはCreate()
+
+<br>
+作成中

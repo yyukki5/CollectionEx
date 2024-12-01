@@ -1,4 +1,5 @@
 Attribute VB_Name = "Sample"
+'<dir .\Sample /dir>
 Option Explicit
 
 Sub SampleCode()
@@ -12,10 +13,10 @@ Sub SampleCode()
         
     Dim res
     res = ColEx(col) _
-        .Where("x=>x.abc<7") _
-        .OrderByDescending("x=>x.abc") _
+        .Where("abc", cexLessThan, 7) _
+        .OrderByDescending("abc") _
         .Take(3) _
-        .SelectBy("x=>x.abc") _
+        .SelectBy("abc") _
         .ToArray
             
     For i = LBound(res) To UBound(res)
