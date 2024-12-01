@@ -177,23 +177,27 @@ Public Function Skip(cnt As Long) As ColEx
 End Function
 
 
-Public Function AllBy(property_name As String) As Boolean
+Public Function AllBy(Optional property_name As String, _
+                      Optional compare_operator As Operators, _
+                      Optional compare_value As Variant) As Boolean
     Dim c
     
     AllBy = False
     For Each c In items_
-         If CallByName(c, property_name, VbGet) = False Then Exit Function
+         If Compare2(c, property_name, compare_operator, compare_value) = False Then Exit Function
     Next
     
     AllBy = True
 End Function
 
-Public Function AnyBy(property_name As String) As Boolean
+Public Function AnyBy(Optional property_name As String, _
+                      Optional compare_operator As Operators, _
+                      Optional compare_value As Variant) As Boolean
     Dim c
     
     AnyBy = True
     For Each c In items_
-         If CallByName(c, property_name, VbGet) = True Then Exit Function
+         If Compare2(c, property_name, compare_operator, compare_value) = True Then Exit Function
     Next
     
     AnyBy = False

@@ -31,6 +31,7 @@ Sub RunTests()
     test.RegisterTest "Test_Initialize_Create_Enum"
     test.RegisterTest "Test_Where"
     test.RegisterTest "Test_SelectBy"
+    test.RegisterTest "Test_AnyAll"
     test.RegisterTest "Test_TakeSkip"
     test.RegisterTest "Test_FirstLast"
     test.RegisterTest "Test_Order"
@@ -123,6 +124,22 @@ Sub Test_SelectBy()
         Call .AssertEqual(2, ColEx(col_).SelectBy("def").Items(1).def)
     End With
 End Sub
+
+'[Fact]
+Sub Test_AnyAll()
+    TestInitialize
+    
+    With UnitTest
+        Call .NameOf("Any")
+        Call .AssertTrue(ColEx(col_).AnyBy("abc", cexGreaterThan, 3))
+        Call .AssertFalse(ColEx(col_).AnyBy("abc", cexGreaterThan, 1000))
+    
+        Call .NameOf("All")
+        Call .AssertTrue(ColEx(col_).AllBy("abc", cexGreaterThan, 0))
+        Call .AssertFalse(ColEx(col_).AllBy("abc", cexGreaterThan, 4))
+    End With
+End Sub
+
 
 '[Fact]
 Sub Test_TakeSkip()
