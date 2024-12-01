@@ -14,20 +14,32 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.7.0 (developing)
+' Version: 0.8.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
 
 
-Public Function Init(enumVariant) As CollectionEx
-Attribute Init.VB_Description = "Default Function"
-Attribute Init.VB_UserMemId = 0
-    Dim col As Collection, c: Set col = New Collection
-    For Each c In enumVariant: col.Add c: Next
+Public Function Init(col As Collection) As CollectionEx
     Set items_ = col
     Set Init = Me
 End Function
+
+Public Function Create(enum_variant) As CollectionEx
+Attribute Create.VB_Description = "Return new instance of CollectionEx"
+Attribute Create.VB_UserMemId = 0
+    Dim col As Collection, c
+    
+    Set col = New Collection
+    For Each c In enum_variant
+        Call col.Add(c)
+    Next
+
+    Dim cex As New CollectionEx
+    Set Create = cex.Init(col)
+End Function
+
+
 
 Public Property Get Items() As Collection
     Set Items = items_
