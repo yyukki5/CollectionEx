@@ -14,20 +14,32 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.7.0 (developing)
+' Version: 0.8.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
 
 
-Public Function Init(enumVariant) As CollectionEx
-Attribute Init.VB_Description = "Default Function"
-Attribute Init.VB_UserMemId = 0
-    Dim col As Collection, c: Set col = New Collection
-    For Each c In enumVariant: col.Add c: Next
+Public Function Initialize(col As Collection) As CollectionEx
     Set items_ = col
-    Set Init = Me
+    Set Initialize = Me
 End Function
+
+Public Function Create(enum_variant) As CollectionEx
+Attribute Create.VB_Description = "Return new instance of CollectionEx"
+Attribute Create.VB_UserMemId = 0
+    Dim col As Collection, c
+    
+    Set col = New Collection
+    For Each c In enum_variant
+        Call col.Add(c)
+    Next
+
+    Dim cex As New CollectionEx
+    Set Create = cex.Initialize(col)
+End Function
+
+
 
 Public Property Get Items() As Collection
     Set Items = items_
@@ -38,27 +50,27 @@ Public Property Get Item(Optional index As Long = 1)
 End Property
 
 
-Public Function Where(lambdaString As String) As CollectionEx
+Public Function Where(lambda_string As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx
     For Each c In items_
-        If Lambda(c, lambdaString).Evaluate = True Then col.Add c
+        If Lambda(c, lambda_string).Evaluate = True Then col.Add c
     Next
-    Set Where = recol.Init(col)
+    Set Where = recol.Initialize(col)
 End Function
 
-Public Function SelectBy(lambdaString As String) As CollectionEx
+Public Function SelectBy(lambda_string As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx
     For Each c In items_
-        col.Add Lambda(c, lambdaString).Evaluate
+        col.Add Lambda(c, lambda_string).Evaluate
     Next
-    Set SelectBy = recol.Init(col)
+    Set SelectBy = recol.Initialize(col)
 End Function
 
-Public Function Count(Optional lambdaString As String) As Long
-    If lambdaString = "" Then Count = items_.Count: Exit Function
+Public Function Count(Optional lambda_string As String) As Long
+    If lambda_string = "" Then Count = items_.Count: Exit Function
     Dim col As New Collection, c
     For Each c In items_
-        If Lambda(c, lambdaString).Evaluate Then col.Add c
+        If Lambda(c, lambda_string).Evaluate Then col.Add c
     Next
     Count = col.Count
 End Function
@@ -81,67 +93,67 @@ Public Function Remove(index) As CollectionEx
     Set Remove = Me
 End Function
 
-Public Function First(Optional lambdaString As String)
+Public Function First(Optional lambda_string As String)
     Dim col As Collection
     If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items")
     
-    Set col = FirstLastCore(lambdaString)
+    Set col = FirstLastCore(lambda_string)
     If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items") Else Call SetObjectAsBuffer(col.Item(1), First)
 End Function
     
-Public Function FirstOrDefault(Optional lambdaString As String, Optional default_value As Variant = Null)
+Public Function FirstOrDefault(Optional lambda_string As String, Optional default_value As Variant = Null)
     Dim col As Collection
     If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, FirstOrDefault): Exit Function
-    Set col = FirstLastCore(lambdaString)
+    Set col = FirstLastCore(lambda_string)
     If col.Count = 0 Then Call SetObjectAsBuffer(default_value, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
 End Function
 
-Public Function Last(Optional lambdaString As String)
+Public Function Last(Optional lambda_string As String)
     Dim col As Collection
     If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items")
-    Set col = FirstLastCore(lambdaString)
+    Set col = FirstLastCore(lambda_string)
     If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items") Else Call SetObjectAsBuffer(col.Item(col.Count), Last)
 End Function
 
-Public Function LastOrDefault(Optional lambdaString As String, Optional default_value As Variant = Null)
+Public Function LastOrDefault(Optional lambda_string As String, Optional default_value As Variant = Null)
     Dim col As Collection
     If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault): Exit Function
-    Set col = FirstLastCore(lambdaString)
+    Set col = FirstLastCore(lambda_string)
     If col.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
 End Function
 
-Public Function Skip(skipIndex As Long) As CollectionEx
+Public Function Skip(skip_index As Long) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, i As Long
     For Each c In items_
         i = i + 1
-        If i > skipIndex Then col.Add c
+        If i > skip_index Then col.Add c
     Next
-    Set Skip = recol.Init(col)
+    Set Skip = recol.Initialize(col)
 End Function
 
-Public Function Take(takeIndex As Long) As CollectionEx
+Public Function Take(take_index As Long) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, i As Long
     For Each c In items_
         i = i + 1
-        If i <= takeIndex Then col.Add c
+        If i <= take_index Then col.Add c
     Next
-    Set Take = recol.Init(col)
+    Set Take = recol.Initialize(col)
 End Function
 
-Public Function AllBy(lambdaString As String) As Boolean
+Public Function AllBy(lambda_string As String) As Boolean
     Dim col As New Collection, c
     AllBy = False
     For Each c In items_
-         If Lambda(c, lambdaString).Evaluate = False Then Exit Function
+         If Lambda(c, lambda_string).Evaluate = False Then Exit Function
     Next
     AllBy = True
 End Function
 
-Public Function AnyBy(lambdaString As String) As Boolean
+Public Function AnyBy(lambda_string As String) As Boolean
     Dim col As New Collection, c
     AnyBy = True
     For Each c In items_
-         If Lambda(c, lambdaString).Evaluate = True Then Exit Function
+         If Lambda(c, lambda_string).Evaluate = True Then Exit Function
     Next
     AnyBy = False
 End Function
@@ -191,16 +203,16 @@ Public Function Min() As Variant
     Min = tmp
 End Function
 
-Public Function Orderby(lambdaString As String) As CollectionEx
+Public Function Orderby(lambda_string As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, sortcol As New CollectionEx
     For Each c In items_:         col.Add c:    Next
-    Set Orderby = recol.Init(QuickSort(sortcol.Init(col), 1, items_.Count, True, lambdaString))
+    Set Orderby = recol.Initialize(QuickSort(sortcol.Initialize(col), 1, items_.Count, True, lambda_string))
 End Function
 
-Public Function OrderByDescending(lambdaString As String) As CollectionEx
+Public Function OrderByDescending(lambda_string As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, sortcol As New CollectionEx
     For Each c In items_:         col.Add c:    Next
-    Set OrderByDescending = recol.Init(QuickSort(sortcol.Init(col), 1, items_.Count, False, lambdaString))
+    Set OrderByDescending = recol.Initialize(QuickSort(sortcol.Initialize(col), 1, items_.Count, False, lambda_string))
 End Function
 
 Public Function ToArray()
@@ -216,11 +228,11 @@ End Function
 
 
 ' private functions --------------------------------
-Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, lambdaString As String) As Collection
+Private Function QuickSort(ByRef cex As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, lambda_string As String) As Collection
     Dim i As Long, j As Long, pivot As Variant, temp, Lam As Collection, col As Collection
     
-    Set Lam = colEx.SelectBy(lambdaString).Items
-    Set col = colEx.Items
+    Set Lam = cex.SelectBy(lambda_string).Items
+    Set col = cex.Items
     i = low
     j = up
     pivot = Lam(Round((low + up) \ 2, 0))
@@ -248,15 +260,15 @@ Private Function QuickSort(ByRef colEx As CollectionEx, ByVal low As Long, ByVal
             j = j - 1
         End If
     Loop
-    Call colEx.Init(col)
-    If low < j Then QuickSort colEx, low, j, isAsc, lambdaString
-    If i < up Then QuickSort colEx, i, up, isAsc, lambdaString
-    Set QuickSort = colEx.Items
+    Call cex.Initialize(col)
+    If low < j Then Call QuickSort(cex, low, j, isAsc, lambda_string)
+    If i < up Then Call QuickSort(cex, i, up, isAsc, lambda_string)
+    Set QuickSort = cex.Items
 End Function
 
-Private Function FirstLastCore(lambdaString As String)
+Private Function FirstLastCore(lambda_string As String)
     Dim col As Collection
-    If lambdaString <> "" Then Set col = Where(lambdaString).Items Else Set col = items_
+    If lambda_string <> "" Then Set col = Where(lambda_string).Items Else Set col = items_
     Set FirstLastCore = col
 End Function
 
