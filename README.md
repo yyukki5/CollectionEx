@@ -11,7 +11,7 @@ Expanding Collection's function.
         .SelectBy("x => x.abc") _
         .ToArray
     
-    set res2 = CollectionEx.Init(col).Take(3).Items
+    set res2 = CollectionEx.Initialize(col).Take(3).Items
 ~~~
 
 ## Features
@@ -79,7 +79,10 @@ Simplified Collection
     - Contains() 
 
 <br>
+ * If comparing objects as equal, objects should has Equals() function. if not has, raise error. 
  * Specification may be changed until version 1.0.0.  
+
+
 
 
 ## Japanese Note
