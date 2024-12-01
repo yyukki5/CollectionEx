@@ -1,4 +1,5 @@
 Attribute VB_Name = "Sample"
+'<dir .\Sample /dir>
 Option Explicit
 
 Sub SampleCode()
@@ -7,15 +8,15 @@ Sub SampleCode()
     Dim i As Long
     For i = 1 To 10
         Set cls1 = New Class1
-        col.Add cls1.Init(i)
+        Call col.Add(cls1.Init(i))
     Next
-    
+        
     Dim res
-    res = CollectionEx(col) _
-        .Where("x=>x.abc<7") _
-        .OrderByDescending("x=>x.abc") _
+    res = ColEx(col) _
+        .Where("abc", cexLessThan, 7) _
+        .OrderByDescending("abc") _
         .Take(3) _
-        .SelectBy("x=>x.abc") _
+        .SelectBy("abc") _
         .ToArray
             
     For i = LBound(res) To UBound(res)

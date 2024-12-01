@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'<dir .\Sample /dir>
 Option Explicit
 
 Private abc_
@@ -34,3 +35,7 @@ Function DebugPrint()
     Debug.Print abc_
 End Function
 
+Public Function Create(a) As Class1
+    Dim cls1 As New Class1
+    Set Create = cls1.Init(a)
+End Function
