@@ -65,13 +65,21 @@ End Property
 
 
 
-Public Sub Add(class_item As Variant)
+Public Function Add(class_item As Variant) As ColEx
     Call items_.Add(class_item)
-End Sub
-
-Public Sub Remove(item_index As Long)
+    Set Add = Me
+End Function
+Public Function AddRange(col As Collection) As ColEx
+    Dim c
+    For Each c In col
+        items_.Add c
+    Next
+    Set AddRange = Me
+End Function
+Public Function Remove(item_index As Long) As ColEx
     Call items_.Remove(item_index)
-End Sub
+    Set Remove = Me
+End Function
 
 
 Public Function Where(Optional property_name As String, _

@@ -29,6 +29,7 @@ Sub RunTests()
    Dim test As New UnitTest
 
     test.RegisterTest "Test_Initialize_Create_Enum"
+    test.RegisterTest "Test_Add"
     test.RegisterTest "Test_Where"
     test.RegisterTest "Test_SelectBy"
     test.RegisterTest "Test_AnyAll"
@@ -97,6 +98,18 @@ Sub Test_Initialize_Create_Enum()
         
     With UnitTest.NameOf("collection instance is not same (copied)")
         Call .AssertFalse(ColEx(col).Items Is col)
+    End With
+End Sub
+
+
+'[Fact]
+Sub Test_Add()
+    TestInitialize
+    
+    With UnitTest
+        Call .NameOf("Add/AddRange")
+        Call .AssertEqual(10, ColEx(col_).Add(col_(1)).Add(col_(2)).Count)
+        Call .AssertEqual(16, ColEx(col_).AddRange(col_).Count)
     End With
 End Sub
 
