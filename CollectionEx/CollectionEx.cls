@@ -29,7 +29,7 @@ Public Function Create(enum_variant) As CollectionEx
 Attribute Create.VB_Description = "Return new instance of CollectionEx"
 Attribute Create.VB_UserMemId = 0
     Dim col As Collection, c
-    
+
     Set col = New Collection
     For Each c In enum_variant
         Call col.Add(c)
@@ -39,14 +39,12 @@ Attribute Create.VB_UserMemId = 0
     Set Create = cex.Initialize(col)
 End Function
 
-
-
+Public Property Get NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+    Set NewEnum = items_.[_NewEnum]
+End Property
 Public Property Get Items() As Collection
     Set Items = items_
-End Property
-
-Public Property Get Item(Optional index As Long = 1)
-    SetObjectAsBuffer items_.Item(index), Item
 End Property
 
 
