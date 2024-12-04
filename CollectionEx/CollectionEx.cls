@@ -29,7 +29,7 @@ Public Function Create(enum_variant) As CollectionEx
 Attribute Create.VB_Description = "Return new instance of CollectionEx"
 Attribute Create.VB_UserMemId = 0
     Dim col As Collection, c
-    
+
     Set col = New Collection
     For Each c In enum_variant
         Call col.Add(c)
