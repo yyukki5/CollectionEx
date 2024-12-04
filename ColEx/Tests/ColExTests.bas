@@ -32,6 +32,7 @@ Sub RunTests()
     test.RegisterTest "Test_Add"
     test.RegisterTest "Test_Where"
     test.RegisterTest "Test_SelectBy"
+    test.RegisterTest "Test_SelectManyBy"
     test.RegisterTest "Test_AnyAll"
     test.RegisterTest "Test_TakeSkip"
     test.RegisterTest "Test_FirstLast"
@@ -127,6 +128,7 @@ Sub Test_Where()
     End With
 End Sub
 
+
 '[Fact]
 Sub Test_SelectBy()
     TestInitialize
@@ -137,6 +139,17 @@ Sub Test_SelectBy()
         Call .AssertEqual(2, ColEx(col_).SelectBy("def").Items(1).def)
     End With
 End Sub
+
+'[Fact]
+Sub Test_SelectManyBy()
+    TestInitialize
+        
+    With UnitTest
+        Call .AssertEqual(24, ColEx(col_).SelectManyBy("Defs").Count)
+        Call .AssertEqual("Class2", TypeName(ColEx(col_).SelectManyBy("Defs").Items(1)))
+    End With
+End Sub
+
 
 '[Fact]
 Sub Test_AnyAll()

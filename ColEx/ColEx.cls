@@ -11,7 +11,7 @@ Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.1.0 (developing)
+' Version: 0.2.0 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -105,6 +105,19 @@ Public Function SelectBy(property_name As String) As ColEx
     Next
     
     Set SelectBy = recol.Initialize(col)
+End Function
+
+Public Function SelectManyBy(property_name As String) As ColEx
+    Dim c As Variant, c1 As Variant, col As Collection, recol As New ColEx
+    Set col = New Collection
+    
+    For Each c In items_
+        For Each c1 In CallByName(c, property_name, VbGet)
+            Call col.Add(c1)
+        Next
+    Next
+
+    Set SelectManyBy = recol.Initialize(col)
 End Function
 
 
