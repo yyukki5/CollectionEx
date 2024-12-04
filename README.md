@@ -44,7 +44,7 @@ LINQライクに出来るといいかなと思ったが、まだ計算できな�
 
 
 # ColEx
-Simplified Collection
+Simplified and Faster CollectionEx
 
 
 ## How to use
@@ -72,14 +72,14 @@ Simplified Collection
 1. can use "For Each"
 1. Any LINQ functions
     - Where()
-    - SelectBy()
+    - SelectBy(), SelectManyBy()
     - AnyBy(), AllBy()
     - Take(), Skip()
     - OrderBy(), OrderByDescending()
     - Contains() 
 
 <br>
- * If comparing objects as equal, objects should has Equals() function. if not has, raise error. 
+ * If comparing objects as equal, objects should has Equals() function. if not has, raise error. <br>
  * Specification may be changed until version 1.0.0.  
 
 
@@ -88,9 +88,10 @@ Simplified Collection
 ## Japanese Note
 CollectionEx を簡略化、軽量化したもの。（Lambda を使っていない）  
 
-要素の直下のプロパティを使ってWhereしたり、Selectしたり出来る。  
-2階層以降のプロパティにはアクセスできないので For Each を使う。  
-デフォルトメソッドはCreate()
+- 要素の直下のプロパティを使ってWhereしたり、Selectしたり出来る  
+- 2階層以降のプロパティにはアクセスできないので For Each を使う  
+- メソッドを使う場合は、ForEachを利用するか、CollectionExを使う
+- デフォルトメソッドはCreate()
 
 <br>
 作成中
