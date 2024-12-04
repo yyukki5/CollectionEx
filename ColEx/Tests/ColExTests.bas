@@ -32,6 +32,7 @@ Sub RunTests()
     test.RegisterTest "Test_Add"
     test.RegisterTest "Test_Where"
     test.RegisterTest "Test_SelectBy"
+    test.RegisterTest "Test_SelectManyBy"
     test.RegisterTest "Test_AnyAll"
     test.RegisterTest "Test_TakeSkip"
     test.RegisterTest "Test_FirstLast"
@@ -144,8 +145,8 @@ Sub Test_SelectManyBy()
     TestInitialize
         
     With UnitTest
-        Call .AssertEqual(24, ColEx(col_).SelectManyBy("Class23").Count)
-        Call .AssertEqual("Class2", TypeName(ColEx(col_).SelectManyBy("Class23").Items(1)))
+        Call .AssertEqual(24, ColEx(col_).SelectManyBy("Defs").Count)
+        Call .AssertEqual("Class2", TypeName(ColEx(col_).SelectManyBy("Defs").Items(1)))
     End With
 End Sub
 
