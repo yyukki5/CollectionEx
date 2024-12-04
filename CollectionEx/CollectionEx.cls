@@ -66,6 +66,20 @@ Public Function SelectBy(lambda_string As String) As CollectionEx
     Set SelectBy = recol.Initialize(col)
 End Function
 
+Public Function SelectManyBy(lambda_string As String) As CollectionEx
+    Dim c As Variant, c1 As Variant, col As Collection, recol As New CollectionEx
+    Set col = New Collection
+    
+    For Each c In items_
+        For Each c1 In Lambda(c, lambda_string).Evaluate
+            Call col.Add(c1)
+        Next
+    Next
+
+    Set SelectManyBy = recol.Initialize(col)
+End Function
+
+
 Public Function Count(Optional lambda_string As String) As Long
     If lambda_string = "" Then Count = items_.Count: Exit Function
     Dim col As New Collection, c
