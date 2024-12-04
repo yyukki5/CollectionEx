@@ -127,6 +127,7 @@ Sub Test_Where()
     End With
 End Sub
 
+
 '[Fact]
 Sub Test_SelectBy()
     TestInitialize
@@ -137,6 +138,17 @@ Sub Test_SelectBy()
         Call .AssertEqual(2, ColEx(col_).SelectBy("def").Items(1).def)
     End With
 End Sub
+
+'[Fact]
+Sub Test_SelectManyBy()
+    TestInitialize
+        
+    With UnitTest
+        Call .AssertEqual(24, ColEx(col_).SelectManyBy("Class23").Count)
+        Call .AssertEqual("Class2", TypeName(ColEx(col_).SelectManyBy("Class23").Items(1)))
+    End With
+End Sub
+
 
 '[Fact]
 Sub Test_AnyAll()
