@@ -19,7 +19,7 @@ End Property
 Property Get def()
     Set def = def_
 End Property
-Property Get Class23()
+Property Get Defs()
     Dim col As New Collection
     Dim c21 As New Class2, c22 As New Class2, c23 As New Class2
     
@@ -27,7 +27,7 @@ Property Get Class23()
     Call col.Add(c22.Init(abc_ + 1))
     Call col.Add(c23.Init(abc_ + 2))
     
-    Set Class23 = col
+    Set Defs = col
 End Property
 Function Init(a) As Class1
     abc_ = a
