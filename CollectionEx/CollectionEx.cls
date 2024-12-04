@@ -39,8 +39,10 @@ Attribute Create.VB_UserMemId = 0
     Set Create = cex.Initialize(col)
 End Function
 
-
-
+Public Property Get NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+    Set NewEnum = items_.[_NewEnum]
+End Property
 Public Property Get Items() As Collection
     Set Items = items_
 End Property
