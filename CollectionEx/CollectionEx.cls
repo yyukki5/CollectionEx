@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.8.0 (developing)
+' Version: 0.9.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
@@ -182,7 +182,7 @@ End Function
 Public Function Sum() As Double
     Dim c, val As Double
     If items_.Count = 0 Then Sum = 0: Exit Function
-    If IsNumeric(Item) = False Then Err.Raise 9001, , Err.Description
+    If IsNumeric(Items(1)) = False Then Err.Raise 9001, , Err.Description
     For Each c In items_
          val = val + c
     Next
@@ -198,7 +198,7 @@ End Function
 Public Function Max() As Variant
     Dim c, tmp
     If items_.Count = 0 Then Max = Null: Exit Function
-    tmp = Item
+    tmp = Items(1)
     For Each c In items_
         tmp = IIf(c > tmp, c, tmp)
     Next
@@ -208,7 +208,7 @@ End Function
 Public Function Min() As Variant
     Dim c, tmp
     If items_.Count = 0 Then Min = Null: Exit Function
-    tmp = Item
+    tmp = Items(1)
     For Each c In items_
         tmp = IIf(c < tmp, c, tmp)
     Next
