@@ -47,10 +47,6 @@ Public Property Get Items() As Collection
     Set Items = items_
 End Property
 
-Public Property Get Item(Optional index As Long = 1)
-    SetObjectAsBuffer items_.Item(index), Item
-End Property
-
 
 Public Function Where(lambda_string As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx
