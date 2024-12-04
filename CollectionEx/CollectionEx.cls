@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.8.0 (developing)
+' Version: 0.9.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
@@ -29,7 +29,7 @@ Public Function Create(enum_variant) As CollectionEx
 Attribute Create.VB_Description = "Return new instance of CollectionEx"
 Attribute Create.VB_UserMemId = 0
     Dim col As Collection, c
-    
+
     Set col = New Collection
     For Each c In enum_variant
         Call col.Add(c)
@@ -39,14 +39,12 @@ Attribute Create.VB_UserMemId = 0
     Set Create = cex.Initialize(col)
 End Function
 
-
-
+Public Property Get NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+    Set NewEnum = items_.[_NewEnum]
+End Property
 Public Property Get Items() As Collection
     Set Items = items_
-End Property
-
-Public Property Get Item(Optional index As Long = 1)
-    SetObjectAsBuffer items_.Item(index), Item
 End Property
 
 
@@ -65,6 +63,20 @@ Public Function SelectBy(lambda_string As String) As CollectionEx
     Next
     Set SelectBy = recol.Initialize(col)
 End Function
+
+Public Function SelectManyBy(lambda_string As String) As CollectionEx
+    Dim c As Variant, c1 As Variant, col As Collection, recol As New CollectionEx
+    Set col = New Collection
+    
+    For Each c In items_
+        For Each c1 In Lambda(c, lambda_string).Evaluate
+            Call col.Add(c1)
+        Next
+    Next
+
+    Set SelectManyBy = recol.Initialize(col)
+End Function
+
 
 Public Function Count(Optional lambda_string As String) As Long
     If lambda_string = "" Then Count = items_.Count: Exit Function
@@ -170,7 +182,7 @@ End Function
 Public Function Sum() As Double
     Dim c, val As Double
     If items_.Count = 0 Then Sum = 0: Exit Function
-    If IsNumeric(Item) = False Then Err.Raise 9001, , Err.Description
+    If IsNumeric(Items(1)) = False Then Err.Raise 9001, , Err.Description
     For Each c In items_
          val = val + c
     Next
@@ -186,7 +198,7 @@ End Function
 Public Function Max() As Variant
     Dim c, tmp
     If items_.Count = 0 Then Max = Null: Exit Function
-    tmp = Item
+    tmp = Items(1)
     For Each c In items_
         tmp = IIf(c > tmp, c, tmp)
     Next
@@ -196,7 +208,7 @@ End Function
 Public Function Min() As Variant
     Dim c, tmp
     If items_.Count = 0 Then Min = Null: Exit Function
-    tmp = Item
+    tmp = Items(1)
     For Each c In items_
         tmp = IIf(c < tmp, c, tmp)
     Next
