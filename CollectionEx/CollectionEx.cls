@@ -134,6 +134,47 @@ Public Function LastOrDefault(Optional lambda_string As String, Optional default
     If col.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
 End Function
 
+Public Function SingleBy(Optional lambda_string As String)
+    Dim i As Long, f As Boolean
+    If lambda_string = "" Then
+        If items_.Count = 1 Then
+            Call SetObjectAsBuffer(items_(1), SingleBy): Exit Function
+        Else
+            Call Err.Raise(9002, "CollectionEx.SingleBy()", "The input sequence contains more than one element.")
+        End If
+    End If
+    
+    For i = 1 To items_.Count
+        If Lambda(items_(i), lambda_string).Evaluate Then
+            If f = False Then f = True Else Call Err.Raise(9002, "CollectionEx.SingleBy()", "The input sequence contains more than one element.")
+            Call SetObjectAsBuffer(items_(i), SingleBy)
+        End If
+    Next i
+        
+    If f = False Then Call Err.Raise(9001, "CollectionEx.SingleBy()", "No element satisfies the comparing condition. or The sequence is empty")
+End Function
+
+Public Function SingleOrDefaultBy(Optional lambda_string As String, Optional default_value As Variant = Null)
+    Dim i As Long, f As Boolean
+    If lambda_string = "" Then
+        If items_.Count = 1 Then
+            Call SetObjectAsBuffer(items_(1), SingleOrDefaultBy): Exit Function
+        Else
+            Call Err.Raise(9002, "CollectionEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+        End If
+    End If
+    
+    For i = 1 To items_.Count
+        If Lambda(items_(i), lambda_string).Evaluate Then
+            If f = False Then f = True Else Call Err.Raise(9002, "CollectionEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+            Call SetObjectAsBuffer(items_(i), SingleOrDefaultBy)
+        End If
+    Next i
+        
+    If f = False Then Call SetObjectAsBuffer(default_value, SingleOrDefaultBy)
+End Function
+
+
 Public Function Skip(skip_index As Long) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, i As Long
     For Each c In items_
