@@ -20,3 +20,6 @@ Function Init(a) As Class2
     def_ = a
     Set Init = Me
 End Function
+Function Equals(cls2 As Class2) As Boolean
+    Equals = Me.def = cls2.def
+End Function
