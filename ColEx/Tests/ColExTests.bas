@@ -188,7 +188,11 @@ End Sub
 Sub Test_FirstLast()
     TestInitialize
     
+    Dim cls As New Class1
+    Dim col As New Collection
+        
     With UnitTest
+        .NameOf ("First/FirstOrDefault")
         Call .AssertEqual(col_(2), ColEx(col_).First("abc", cexEqual, 2))
         Call .AssertEqual(col_(1), ColEx(col_).First())
         Call .AssertEqual(col_(2), ColEx(col_).FirstOrDefault("abc", cexEqual, 2))
@@ -196,7 +200,14 @@ Sub Test_FirstLast()
         Call .AssertEqual(0, ColEx(col_).FirstOrDefault("abc", cexEqual, 1000, 0))
         Call .AssertEqual(Null, ColEx(col_).FirstOrDefault("abc", cexEqual, 1000))
         Call .AssertTrue(ColEx(col_).FirstOrDefault("abc", cexEqual, 1000, Nothing) Is Nothing)
+        On Error Resume Next
+        Call ColEx(col_).First("abc", cexEqual, 100)
+        Call .AssertHasError
+        Call ColEx(col).First
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).FirstOrDefault(, , , Nothing) Is Nothing)
         
+        .NameOf ("Last/LastOrDefault")
         Call .AssertEqual(col_(2), ColEx(col_).Last("abc", cexEqual, 2))
         Call .AssertEqual(col_(col_.Count), ColEx(col_).Last())
         Call .AssertEqual(col_(2), ColEx(col_).LastOrDefault("abc", cexEqual, 2))
@@ -204,6 +215,37 @@ Sub Test_FirstLast()
         Call .AssertEqual(0, ColEx(col_).LastOrDefault("abc", cexEqual, 1000, 0))
         Call .AssertEqual(Null, ColEx(col_).LastOrDefault("abc", cexEqual, 1000))
         Call .AssertTrue(ColEx(col_).LastOrDefault("abc", cexEqual, 1000, Nothing) Is Nothing)
+        On Error Resume Next
+        Call ColEx(col_).Last("abc", cexEqual, 100)
+        Call .AssertHasError
+        Call ColEx(col).Last
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).LastOrDefault(, , , Nothing) Is Nothing)
+        
+        .NameOf ("Single/SingleOrDefault")
+        Call .AssertEqual(col_(5), ColEx(col_).SingleBy("abc", cexEqual, 5))
+        Call .AssertEqual(col_(5), ColEx(col_).SingleOrDefaultBy("abc", cexEqual, 5))
+        Call .AssertTrue(ColEx(col_).SingleOrDefaultBy("abc", cexEqual, 1000, Nothing) Is Nothing)
+        On Error Resume Next
+        Call ColEx(col_).SingleBy("abc", cexEqual, 100)
+        Call .AssertHasError
+        Call ColEx(col_).SingleBy("abc", cexEqual, 2)
+        Call .AssertHasError
+        Call ColEx(col_).SingleOrDefaultBy("abc", cexEqual, 2)
+        Call .AssertHasError
+        Call ColEx(col_).SingleBy
+        Call .AssertHasError
+        Call ColEx(col_).SingleOrDefaultBy
+        Call .AssertHasError
+        Call ColEx(col).SingleBy
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).SingleOrDefaultBy(, , , Nothing) Is Nothing)
+                    
+        Set col = New Collection
+        Call col.Add(cls.Create(1))
+        Call .AssertEqual(cls.Create(1), ColEx(col).SingleBy)
+        Call .AssertEqual(cls.Create(1), ColEx(col).SingleOrDefaultBy)
+
     End With
 End Sub
 
