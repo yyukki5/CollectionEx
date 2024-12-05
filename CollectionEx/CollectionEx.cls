@@ -386,13 +386,3 @@ Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) A
     End If
 End Function
 
-Private Function GetDefaultValue()
-    If items_.Count = 0 Then
-        GetDefaultValue = Null
-    ElseIf IsObject(Item) Then
-        Set GetDefaultValue = Nothing
-    Else
-        GetDefaultValue = Null
-    End If
-End Function
-
