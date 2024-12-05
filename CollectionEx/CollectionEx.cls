@@ -172,10 +172,11 @@ End Function
 
 Public Function Contains(var) As Boolean
     Dim c
-    If IsObject(var) Then Err.Raise 9001, "CollectionEx.Contains()", "Unsupported object"
+    
     For Each c In items_
-        If var = c Then Contains = True: Exit Function
+        If Equals(var, c) Then Contains = True: Exit Function
     Next
+    
     Contains = False
 End Function
 
