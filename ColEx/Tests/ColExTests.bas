@@ -188,6 +188,9 @@ End Sub
 Sub Test_FirstLast()
     TestInitialize
     
+    Dim cls As New Class1
+    Dim col As New Collection
+        
     With UnitTest
         .NameOf ("First/FirstOrDefault")
         Call .AssertEqual(col_(2), ColEx(col_).First("abc", cexEqual, 2))
@@ -200,6 +203,9 @@ Sub Test_FirstLast()
         On Error Resume Next
         Call ColEx(col_).First("abc", cexEqual, 100)
         Call .AssertHasError
+        Call ColEx(col).First
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).FirstOrDefault(, , , Nothing) Is Nothing)
         
         .NameOf ("Last/LastOrDefault")
         Call .AssertEqual(col_(2), ColEx(col_).Last("abc", cexEqual, 2))
@@ -212,6 +218,9 @@ Sub Test_FirstLast()
         On Error Resume Next
         Call ColEx(col_).Last("abc", cexEqual, 100)
         Call .AssertHasError
+        Call ColEx(col).Last
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).LastOrDefault(, , , Nothing) Is Nothing)
         
         .NameOf ("Single/SingleOrDefault")
         Call .AssertEqual(col_(5), ColEx(col_).SingleBy("abc", cexEqual, 5))
@@ -228,9 +237,11 @@ Sub Test_FirstLast()
         Call .AssertHasError
         Call ColEx(col_).SingleOrDefaultBy
         Call .AssertHasError
-                
-        Dim cls As New Class1
-        Dim col As New Collection
+        Call ColEx(col).SingleBy
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).SingleOrDefaultBy(, , , Nothing) Is Nothing)
+                    
+        Set col = New Collection
         Call col.Add(cls.Create(1))
         Call .AssertEqual(cls.Create(1), ColEx(col).SingleBy)
         Call .AssertEqual(cls.Create(1), ColEx(col).SingleOrDefaultBy)
