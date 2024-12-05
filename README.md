@@ -74,7 +74,7 @@ Simplified and Faster CollectionEx
     - Where()
     - SelectBy(), SelectManyBy()
     - AnyBy(), AllBy()
-    - Take(), Skip()
+    - Take(), Skip(), First(), FirstOrDafult(), Last(), LastOrDefault(), SingleBy(), SingleOrDefaultBy()  
     - OrderBy(), OrderByDescending()
     - Contains(), Distinct(), DistinctBy()
 
