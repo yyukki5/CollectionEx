@@ -172,10 +172,11 @@ End Function
 
 Public Function Contains(var) As Boolean
     Dim c
-    If IsObject(var) Then Err.Raise 9001, "CollectionEx.Contains()", "Unsupported object"
+    
     For Each c In items_
-        If var = c Then Contains = True: Exit Function
+        If Equals(var, c) Then Contains = True: Exit Function
     Next
+    
     Contains = False
 End Function
 
@@ -225,6 +226,41 @@ Public Function OrderByDescending(lambda_string As String) As CollectionEx
     Dim col As New Collection, c, recol As New CollectionEx, sortcol As New CollectionEx
     For Each c In items_:         col.Add c:    Next
     Set OrderByDescending = recol.Initialize(QuickSort(sortcol.Initialize(col), 1, items_.Count, False, lambda_string))
+End Function
+
+
+Public Function Distinct() As CollectionEx
+    Dim c As Variant, compare_item As Variant, col As Collection, recol As New CollectionEx, f As Boolean
+    Set col = New Collection
+    
+    For Each c In items_
+        f = False
+        For Each compare_item In col
+            If Equals(compare_item, c) Then f = True: Exit For
+        Next
+        If f = False Then Call col.Add(c)
+    Next
+    
+    Set Distinct = recol.Initialize(col)
+End Function
+
+Public Function DistinctBy(lambda_string As String) As CollectionEx
+    Dim c As Variant, compare_item As Variant, compare_items As Collection, col As Collection, recol As New CollectionEx, f As Boolean, v As Variant
+    Set col = New Collection: Set compare_items = New Collection
+    
+    For Each c In items_
+        f = False
+        Call SetObjectAsBuffer(Lambda(c, lambda_string).Evaluate, v)
+        For Each compare_item In compare_items
+            If Equals(compare_item, v) Then f = True: Exit For
+        Next
+        If f = False Then
+            Call col.Add(c)
+            Call compare_items.Add(v)
+        End If
+    Next
+    
+    Set DistinctBy = recol.Initialize(col)
 End Function
 
 Public Function ToArray()
@@ -284,6 +320,21 @@ Private Function FirstLastCore(lambda_string As String)
     Set FirstLastCore = col
 End Function
 
+
+Private Function Equals(comparing_item, compared_item) As Boolean
+    If IsObject(comparing_item) Then
+        On Error GoTo errUnImplementEquals
+        ' Should the "compare_item" has Equals() function. if not has, raise error
+        If comparing_item.Equals((compared_item)) Then Equals = True
+    Else
+        If comparing_item = compared_item Then Equals = True
+    End If
+    Exit Function
+    
+errUnImplementEquals:
+    Call Err.Raise(9001, "CollectionEx.Equals()", "Equality evaluation failed. Should """ & TypeName(comparing_item) & """ object has ""Equals()"" function.")
+End Function
+
 Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
     If IsObject(unverified_value) Then
         Set buffer_value = unverified_value
@@ -303,3 +354,4 @@ Private Function GetDefaultValue()
         GetDefaultValue = Null
     End If
 End Function
+

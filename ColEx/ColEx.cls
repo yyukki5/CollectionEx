@@ -11,7 +11,7 @@ Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.2.0 (developing)
+' Version: 0.2.1 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -228,12 +228,7 @@ Public Function Contains(compare_item As Variant) As Boolean
     Dim c
     
     For Each c In items_
-        If IsObject(compare_item) Then
-            ' Should the "compare_item" has Equals() function. if not has, raise error
-            If compare_item.Equals(c) Then Contains = True: Exit Function
-        Else
-            If compare_item = c Then Contains = True: Exit Function
-        End If
+        If Equals(compare_item, c) Then Contains = True: Exit Function
     Next
     
     Contains = False
@@ -248,6 +243,39 @@ End Function
 Public Function OrderByDescending(property_name As String) As ColEx
     Set OrderByDescending = New ColEx
     Call OrderByDescending.Initialize(QuickSort(items_, 1, items_.Count, False, property_name))
+End Function
+
+Public Function Distinct() As ColEx
+    Dim c As Variant, compare_item As Variant, col As Collection, recol As New ColEx, f As Boolean
+    Set col = New Collection
+    
+    For Each c In items_
+        f = False
+        For Each compare_item In col
+            If Equals(compare_item, c) Then f = True: Exit For
+        Next
+        If f = False Then Call col.Add(c)
+    Next
+    
+    Set Distinct = recol.Initialize(col)
+End Function
+
+Public Function DistinctBy(property_name As String) As ColEx
+    Dim c As Variant, compare_item As Variant, compare_items As Collection, col As Collection, recol As New ColEx, f As Boolean
+    Set col = New Collection: Set compare_items = New Collection
+    
+    For Each c In items_
+        f = False
+        For Each compare_item In compare_items
+            If Equals(compare_item, CallByName(c, property_name, VbGet)) Then f = True: Exit For
+        Next
+        If f = False Then
+            Call col.Add(c)
+            Call compare_items.Add(CallByName(c, property_name, VbGet))
+        End If
+    Next
+    
+    Set DistinctBy = recol.Initialize(col)
 End Function
 
 
@@ -270,12 +298,7 @@ Private Function Compare(compared_value As Variant, compare_operator As Operator
     Else
         Select Case compare_operator
             Case Operators.cexEqual
-                If IsObject(compared_value) Then
-                    Compare = compared_value.Equals((compare_value))
-                Else
-                    Compare = (compared_value = compare_value)
-                End If
-            
+                Compare = Equals(compare_value, compared_value)
             Case Operators.cexGreaterThan
                 Compare = (compared_value > compare_value)
             Case Operators.cexGreaterThanOrEqualTo
@@ -345,6 +368,19 @@ Private Function QuickSort(ByRef col As Collection, _
     Set QuickSort = sorting_col
 End Function
 
+Private Function Equals(comparing_item, compared_item) As Boolean
+    If IsObject(comparing_item) Then
+        On Error GoTo errUnImplementEquals
+        ' Should the "compare_item" has Equals() function. if not has, raise error
+        If comparing_item.Equals((compared_item)) Then Equals = True
+    Else
+        If comparing_item = compared_item Then Equals = True
+    End If
+    Exit Function
+    
+errUnImplementEquals:
+    Call Err.Raise(9001, "ColEx.Equals()", "Equality evaluation failed. Should """ & TypeName(comparing_item) & """ object has ""Equals()"" function.")
+End Function
 
 Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
     If IsObject(unverified_value) Then

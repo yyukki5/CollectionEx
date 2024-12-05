@@ -37,6 +37,8 @@ Sub RunTests()
     test.RegisterTest "Test_TakeSkip"
     test.RegisterTest "Test_FirstLast"
     test.RegisterTest "Test_Order"
+    test.RegisterTest "Test_Contains"
+    test.RegisterTest "Test_Distinct"
 
     test.RunTests UnitTest
 End Sub
@@ -229,6 +231,49 @@ Sub Test_Order()
         Set res = ColEx(col).OrderByDescending("abc").OrderBy("abc").Items
         Call .AssertEqual(col(1).abc, res(1).abc)
         Call .AssertEqual(col(col.Count).abc, res(res.Count).abc)
+    End With
+        
+End Sub
+
+'[Fact]
+Sub Test_Contains()
+    
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+    
+    With UnitTest.NameOf("Contains")
+        Call .AssertTrue(ColEx(col).Contains(cls.Create(2)))
+        Call .AssertFalse(ColEx(col).Contains(cls.Create(7)))
+    End With
+End Sub
+
+
+'[Fact]
+Sub Test_Distinct()
+    
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(5))
+    
+    Dim res As Collection
+    With UnitTest
+        Call .NameOf("Distinct")
+        Set res = ColEx(col).Distinct().Items
+        Call .AssertEqual(4, res.Count)
+        Call .AssertEqual(1, ColEx(col).Distinct().Where("abc", cexEqual, 1).Count)
+        
+        Call .NameOf("DistinctBy")
+        Set res = ColEx(col).DistinctBy("def").Items
+        Call .AssertEqual(4, res.Count)
+        Call .AssertEqual(7, ColEx(col).SelectManyBy("Defs").DistinctBy("def").Count)
     End With
         
 End Sub
