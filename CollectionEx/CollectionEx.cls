@@ -106,38 +106,59 @@ Public Function Remove(index) As CollectionEx
 End Function
 
 Public Function First(Optional lambda_string As String)
-    Dim col As Collection
-    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items")
+    Dim i As Long
+    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "The sequence is empty")
+    If lambda_string = "" Then Call SetObjectAsBuffer(items_(1), First): Exit Function
     
-    Set col = FirstLastCore(lambda_string)
-    If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "no items") Else Call SetObjectAsBuffer(col.Item(1), First)
+    For i = 1 To items_.Count
+        If Lambda(items_(i), lambda_string).Evaluate Then Call SetObjectAsBuffer(items_(i), First): Exit Function
+    Next i
+    
+    Call Err.Raise(9001, "CollectionEx.First()", "No element satisfies the comparing condition.")
 End Function
     
 Public Function FirstOrDefault(Optional lambda_string As String, Optional default_value As Variant = Null)
-    Dim col As Collection
+    Dim i As Long
     If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, FirstOrDefault): Exit Function
-    Set col = FirstLastCore(lambda_string)
-    If col.Count = 0 Then Call SetObjectAsBuffer(default_value, FirstOrDefault) Else Call SetObjectAsBuffer(col.Item(1), FirstOrDefault)
+    If lambda_string = "" Then Call SetObjectAsBuffer(items_(1), FirstOrDefault): Exit Function
+    
+    For i = 1 To items_.Count
+        If Lambda(items_(i), lambda_string).Evaluate Then Call SetObjectAsBuffer(items_(i), FirstOrDefault): Exit Function
+    Next i
+    
+    Call SetObjectAsBuffer(default_value, FirstOrDefault)
 End Function
 
 Public Function Last(Optional lambda_string As String)
-    Dim col As Collection
-    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items")
-    Set col = FirstLastCore(lambda_string)
-    If col.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "no items") Else Call SetObjectAsBuffer(col.Item(col.Count), Last)
+    Dim i As Long
+    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "The sequence is empty")
+    If lambda_string = "" Then Call SetObjectAsBuffer(items_(items_.Count), Last): Exit Function
+    
+    For i = items_.Count To 1 Step -1
+        If Lambda(items_(i), lambda_string).Evaluate Then Call SetObjectAsBuffer(items_(i), Last): Exit Function
+    Next i
+    
+    Call Err.Raise(9001, "CollectionEx.Last()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function LastOrDefault(Optional lambda_string As String, Optional default_value As Variant = Null)
-    Dim col As Collection
+    Dim i As Long
     If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault): Exit Function
-    Set col = FirstLastCore(lambda_string)
-    If col.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault) Else Call SetObjectAsBuffer(col.Item(col.Count), LastOrDefault)
+    If lambda_string = "" Then Call SetObjectAsBuffer(items_(items_.Count), LastOrDefault): Exit Function
+    
+    For i = items_.Count To 1 Step -1
+        If Lambda(items_(i), lambda_string).Evaluate Then Call SetObjectAsBuffer(items_(i), LastOrDefault): Exit Function
+    Next i
+    
+    Call SetObjectAsBuffer(default_value, LastOrDefault)
 End Function
 
 Public Function SingleBy(Optional lambda_string As String)
     Dim i As Long, f As Boolean
     If lambda_string = "" Then
-        If items_.Count = 1 Then
+        If items_.Count = 0 Then
+            Call Err.Raise(9001, "CollectionEx.SingleBy()", "The sequence is empty")
+        ElseIf items_.Count = 1 Then
             Call SetObjectAsBuffer(items_(1), SingleBy): Exit Function
         Else
             Call Err.Raise(9002, "CollectionEx.SingleBy()", "The input sequence contains more than one element.")
@@ -151,13 +172,15 @@ Public Function SingleBy(Optional lambda_string As String)
         End If
     Next i
         
-    If f = False Then Call Err.Raise(9001, "CollectionEx.SingleBy()", "No element satisfies the comparing condition. or The sequence is empty")
+    If f = False Then Call Err.Raise(9001, "CollectionEx.SingleBy()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function SingleOrDefaultBy(Optional lambda_string As String, Optional default_value As Variant = Null)
     Dim i As Long, f As Boolean
     If lambda_string = "" Then
-        If items_.Count = 1 Then
+        If items_.Count = 0 Then
+            Call SetObjectAsBuffer(default_value, SingleOrDefaultBy): Exit Function
+        ElseIf items_.Count = 1 Then
             Call SetObjectAsBuffer(items_(1), SingleOrDefaultBy): Exit Function
         Else
             Call Err.Raise(9002, "CollectionEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
@@ -354,13 +377,6 @@ Private Function QuickSort(ByRef cex As CollectionEx, ByVal low As Long, ByVal u
     If i < up Then Call QuickSort(cex, i, up, isAsc, lambda_string)
     Set QuickSort = cex.Items
 End Function
-
-Private Function FirstLastCore(lambda_string As String)
-    Dim col As Collection
-    If lambda_string <> "" Then Set col = Where(lambda_string).Items Else Set col = items_
-    Set FirstLastCore = col
-End Function
-
 
 Private Function Equals(comparing_item, compared_item) As Boolean
     If IsObject(comparing_item) Then
