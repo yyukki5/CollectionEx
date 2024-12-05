@@ -131,7 +131,7 @@ Public Function First(Optional property_name As String, _
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), First): Exit Function
     Next i
     
-    Call Err.Raise(9001, "ColEx.First()", "no items")
+    Call Err.Raise(9001, "ColEx.First()", "No element satisfies the comparing condition. or The sequence is empty")
 End Function
 
 Public Function FirstOrDefault(Optional property_name As String, _
@@ -158,7 +158,7 @@ Public Function Last(Optional property_name As String, _
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), Last): Exit Function
     Next i
     
-    Call Err.Raise(9001, "ColEx.Last()", "no items")
+    Call Err.Raise(9001, "ColEx.Last()", "No element satisfies the comparing condition. or The sequence is empty")
 End Function
 
 Public Function LastOrDefault(Optional property_name As String, _
@@ -174,6 +174,40 @@ Public Function LastOrDefault(Optional property_name As String, _
     
     Call SetObjectAsBuffer(default_value, LastOrDefault)
 End Function
+
+Public Function SingleBy(Optional property_name As String, _
+                      Optional compare_operator As Operators, _
+                      Optional compare_value As Variant)
+    Dim i As Long, f As Boolean
+    If items_.Count > 0 And IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(1), First): Exit Function
+    
+    For i = 1 To items_.Count
+        If Compare2(items_(i), property_name, compare_operator, compare_value) Then
+            If f = False Then f = True Else Call Err.Raise(9002, "ColEx.SingleBy()", "The input sequence contains more than one element.")
+            Call SetObjectAsBuffer(items_(i), SingleBy)
+        End If
+    Next i
+        
+    If f = False Then Call Err.Raise(9001, "ColEx.SingleBy()", "No element satisfies the comparing condition. or The sequence is empty")
+End Function
+
+Public Function SingleOrDefaultBy(Optional property_name As String, _
+                      Optional compare_operator As Operators, _
+                      Optional compare_value As Variant, _
+                      Optional default_value As Variant = Null)
+    Dim i As Long, f As Boolean
+    If items_.Count > 0 And IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(1), First): Exit Function
+    
+    For i = 1 To items_.Count
+        If Compare2(items_(i), property_name, compare_operator, compare_value) Then
+            If f = False Then f = True Else Call Err.Raise(9002, "ColEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+            Call SetObjectAsBuffer(items_(i), SingleBy)
+        End If
+    Next i
+        
+    Call SetObjectAsBuffer(default_value, SingleOrDefaultBy)
+End Function
+
 
 Public Function Take(cnt As Long) As ColEx
     Dim c As Variant, col As New Collection, i As Long
