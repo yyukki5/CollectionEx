@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Option Explicit
+Option Explicit On
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.2.0 (developing)
+' Version: 0.3.0 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -125,13 +125,14 @@ Public Function First(Optional property_name As String, _
                       Optional compare_operator As Operators, _
                       Optional compare_value As Variant)
     Dim i As Long
-    If items_.Count > 0 And IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(1), First): Exit Function
+    If items_.Count = 0 Then Call Err.Raise(9001, "ColEx.First()", "The sequence is empty")
+    If IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(1), First): Exit Function
     
     For i = 1 To items_.Count
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), First): Exit Function
     Next i
     
-    Call Err.Raise(9001, "ColEx.First()", "no items")
+    Call Err.Raise(9002, "ColEx.First()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function FirstOrDefault(Optional property_name As String, _
@@ -139,7 +140,8 @@ Public Function FirstOrDefault(Optional property_name As String, _
                       Optional compare_value As Variant, _
                       Optional default_value As Variant = Null)
     Dim i As Long
-    If items_.Count > 0 And IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(1), FirstOrDefault): Exit Function
+    If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, FirstOrDefault): Exit Function
+    If IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(1), FirstOrDefault): Exit Function
     
     For i = 1 To items_.Count
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), FirstOrDefault): Exit Function
@@ -152,13 +154,14 @@ Public Function Last(Optional property_name As String, _
                       Optional compare_operator As Operators, _
                       Optional compare_value As Variant)
     Dim i As Long
-    If items_.Count > 0 And IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(items_.Count), Last): Exit Function
+    If items_.Count = 0 Then Call Err.Raise(9001, "ColEx.Last()", "The sequence is empty")
+    If IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(items_.Count), Last): Exit Function
         
     For i = items_.Count To 1 Step -1
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), Last): Exit Function
     Next i
     
-    Call Err.Raise(9001, "ColEx.Last()", "no items")
+    Call Err.Raise(9002, "ColEx.Last()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function LastOrDefault(Optional property_name As String, _
@@ -166,7 +169,8 @@ Public Function LastOrDefault(Optional property_name As String, _
                       Optional compare_value As Variant, _
                       Optional default_value As Variant = Null)
     Dim i As Long
-    If items_.Count > 0 And IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(items_.Count), LastOrDefault): Exit Function
+    If items_.Count = 0 Then Call SetObjectAsBuffer(default_value, LastOrDefault): Exit Function
+    If IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(items_.Count), LastOrDefault): Exit Function
         
     For i = items_.Count To 1 Step -1
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), LastOrDefault): Exit Function
@@ -174,6 +178,56 @@ Public Function LastOrDefault(Optional property_name As String, _
     
     Call SetObjectAsBuffer(default_value, LastOrDefault)
 End Function
+
+Public Function SingleBy(Optional property_name As String, _
+                      Optional compare_operator As Operators, _
+                      Optional compare_value As Variant)
+    Dim i As Long, f As Boolean
+    If IsMissing(compare_value) Then
+        If items_.Count = 0 Then
+            Call Err.Raise(9001, "ColEx.SingleBy()", "The sequence is empty")
+        ElseIf items_.Count = 1 Then
+            Call SetObjectAsBuffer(items_(1), SingleBy): Exit Function
+        Else
+            Call Err.Raise(9003, "ColEx.SingleBy()", "The input sequence contains more than one element.")
+        End If
+    End If
+    
+    For i = 1 To items_.Count
+        If Compare2(items_(i), property_name, compare_operator, compare_value) Then
+            If f = False Then f = True Else Call Err.Raise(9002, "ColEx.SingleBy()", "The input sequence contains more than one element.")
+            Call SetObjectAsBuffer(items_(i), SingleBy)
+        End If
+    Next i
+        
+    If f = False Then Call Err.Raise(9002, "ColEx.SingleBy()", "No element satisfies the comparing condition.")
+End Function
+
+Public Function SingleOrDefaultBy(Optional property_name As String, _
+                      Optional compare_operator As Operators, _
+                      Optional compare_value As Variant, _
+                      Optional default_value As Variant = Null)
+    Dim i As Long, f As Boolean
+    If IsMissing(compare_value) Then
+        If items_.Count = 0 Then
+            Call SetObjectAsBuffer(default_value, SingleOrDefaultBy): Exit Function
+        ElseIf items_.Count = 1 Then
+            Call SetObjectAsBuffer(items_(1), SingleOrDefaultBy): Exit Function
+        Else
+            Call Err.Raise(9003, "ColEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+        End If
+    End If
+    
+    For i = 1 To items_.Count
+        If Compare2(items_(i), property_name, compare_operator, compare_value) Then
+            If f = False Then f = True Else Call Err.Raise(9003, "ColEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+            Call SetObjectAsBuffer(items_(i), SingleOrDefaultBy)
+        End If
+    Next i
+        
+    If f = False Then Call SetObjectAsBuffer(default_value, SingleOrDefaultBy)
+End Function
+
 
 Public Function Take(cnt As Long) As ColEx
     Dim c As Variant, col As New Collection, i As Long
@@ -228,12 +282,7 @@ Public Function Contains(compare_item As Variant) As Boolean
     Dim c
     
     For Each c In items_
-        If IsObject(compare_item) Then
-            ' Should the "compare_item" has Equals() function. if not has, raise error
-            If compare_item.Equals(c) Then Contains = True: Exit Function
-        Else
-            If compare_item = c Then Contains = True: Exit Function
-        End If
+        If Equals(compare_item, c) Then Contains = True: Exit Function
     Next
     
     Contains = False
@@ -248,6 +297,39 @@ End Function
 Public Function OrderByDescending(property_name As String) As ColEx
     Set OrderByDescending = New ColEx
     Call OrderByDescending.Initialize(QuickSort(items_, 1, items_.Count, False, property_name))
+End Function
+
+Public Function Distinct() As ColEx
+    Dim c As Variant, compare_item As Variant, col As Collection, recol As New ColEx, f As Boolean
+    Set col = New Collection
+    
+    For Each c In items_
+        f = False
+        For Each compare_item In col
+            If Equals(compare_item, c) Then f = True: Exit For
+        Next
+        If f = False Then Call col.Add(c)
+    Next
+    
+    Set Distinct = recol.Initialize(col)
+End Function
+
+Public Function DistinctBy(property_name As String) As ColEx
+    Dim c As Variant, compare_item As Variant, compare_items As Collection, col As Collection, recol As New ColEx, f As Boolean
+    Set col = New Collection: Set compare_items = New Collection
+    
+    For Each c In items_
+        f = False
+        For Each compare_item In compare_items
+            If Equals(compare_item, CallByName(c, property_name, VbGet)) Then f = True: Exit For
+        Next
+        If f = False Then
+            Call col.Add(c)
+            Call compare_items.Add(CallByName(c, property_name, VbGet))
+        End If
+    Next
+    
+    Set DistinctBy = recol.Initialize(col)
 End Function
 
 
@@ -270,12 +352,7 @@ Private Function Compare(compared_value As Variant, compare_operator As Operator
     Else
         Select Case compare_operator
             Case Operators.cexEqual
-                If IsObject(compared_value) Then
-                    Compare = compared_value.Equals((compare_value))
-                Else
-                    Compare = (compared_value = compare_value)
-                End If
-            
+                Compare = Equals(compare_value, compared_value)
             Case Operators.cexGreaterThan
                 Compare = (compared_value > compare_value)
             Case Operators.cexGreaterThanOrEqualTo
@@ -345,6 +422,19 @@ Private Function QuickSort(ByRef col As Collection, _
     Set QuickSort = sorting_col
 End Function
 
+Private Function Equals(comparing_item, compared_item) As Boolean
+    If IsObject(comparing_item) Then
+        On Error GoTo errUnImplementEquals
+        ' Should the "compare_item" has Equals() function. if not has, raise error
+        If comparing_item.Equals((compared_item)) Then Equals = True
+    Else
+        If comparing_item = compared_item Then Equals = True
+    End If
+    Exit Function
+    
+errUnImplementEquals:
+    Call Err.Raise(9001, "ColEx.Equals()", "Equality evaluation failed. Should """ & TypeName(comparing_item) & """ object has ""Equals()"" function.")
+End Function
 
 Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
     If IsObject(unverified_value) Then

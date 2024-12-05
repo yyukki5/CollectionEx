@@ -17,8 +17,8 @@ Expanding Collection's function.
 ## Features
  - No need to write "Dim" and "New" for use.  class is predeclared, and can initialize by class name as default function. 
  - After initialization, run some function and output as Collection or something
- -  Some functions can use "lambda string" (Simply implemented anonymous function by string) 
-
+ - Some functions can use "lambda string" (Simply implemented anonymous function by string) 
+ - If comparing objects as equal, objects should has Equals() function. if not has, raise error
  
 <br>
  * Specification may be changed until version 1.0.0.  
@@ -74,9 +74,9 @@ Simplified and Faster CollectionEx
     - Where()
     - SelectBy(), SelectManyBy()
     - AnyBy(), AllBy()
-    - Take(), Skip()
+    - Take(), Skip(), First(), FirstOrDafult(), Last(), LastOrDefault(), SingleBy(), SingleOrDefaultBy()  
     - OrderBy(), OrderByDescending()
-    - Contains() 
+    - Contains(), Distinct(), DistinctBy()
 
 <br>
  * If comparing objects as equal, objects should has Equals() function. if not has, raise error. <br>

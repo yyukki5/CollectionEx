@@ -37,6 +37,8 @@ Sub RunTests()
     test.RegisterTest "Test_TakeSkip"
     test.RegisterTest "Test_FirstLast"
     test.RegisterTest "Test_Order"
+    test.RegisterTest "Test_Contains"
+    test.RegisterTest "Test_Distinct"
 
     test.RunTests UnitTest
 End Sub
@@ -186,7 +188,11 @@ End Sub
 Sub Test_FirstLast()
     TestInitialize
     
+    Dim cls As New Class1
+    Dim col As New Collection
+        
     With UnitTest
+        .NameOf ("First/FirstOrDefault")
         Call .AssertEqual(col_(2), ColEx(col_).First("abc", cexEqual, 2))
         Call .AssertEqual(col_(1), ColEx(col_).First())
         Call .AssertEqual(col_(2), ColEx(col_).FirstOrDefault("abc", cexEqual, 2))
@@ -194,7 +200,14 @@ Sub Test_FirstLast()
         Call .AssertEqual(0, ColEx(col_).FirstOrDefault("abc", cexEqual, 1000, 0))
         Call .AssertEqual(Null, ColEx(col_).FirstOrDefault("abc", cexEqual, 1000))
         Call .AssertTrue(ColEx(col_).FirstOrDefault("abc", cexEqual, 1000, Nothing) Is Nothing)
+        On Error Resume Next
+        Call ColEx(col_).First("abc", cexEqual, 100)
+        Call .AssertHasError
+        Call ColEx(col).First
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).FirstOrDefault(, , , Nothing) Is Nothing)
         
+        .NameOf ("Last/LastOrDefault")
         Call .AssertEqual(col_(2), ColEx(col_).Last("abc", cexEqual, 2))
         Call .AssertEqual(col_(col_.Count), ColEx(col_).Last())
         Call .AssertEqual(col_(2), ColEx(col_).LastOrDefault("abc", cexEqual, 2))
@@ -202,6 +215,37 @@ Sub Test_FirstLast()
         Call .AssertEqual(0, ColEx(col_).LastOrDefault("abc", cexEqual, 1000, 0))
         Call .AssertEqual(Null, ColEx(col_).LastOrDefault("abc", cexEqual, 1000))
         Call .AssertTrue(ColEx(col_).LastOrDefault("abc", cexEqual, 1000, Nothing) Is Nothing)
+        On Error Resume Next
+        Call ColEx(col_).Last("abc", cexEqual, 100)
+        Call .AssertHasError
+        Call ColEx(col).Last
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).LastOrDefault(, , , Nothing) Is Nothing)
+        
+        .NameOf ("Single/SingleOrDefault")
+        Call .AssertEqual(col_(5), ColEx(col_).SingleBy("abc", cexEqual, 5))
+        Call .AssertEqual(col_(5), ColEx(col_).SingleOrDefaultBy("abc", cexEqual, 5))
+        Call .AssertTrue(ColEx(col_).SingleOrDefaultBy("abc", cexEqual, 1000, Nothing) Is Nothing)
+        On Error Resume Next
+        Call ColEx(col_).SingleBy("abc", cexEqual, 100)
+        Call .AssertHasError
+        Call ColEx(col_).SingleBy("abc", cexEqual, 2)
+        Call .AssertHasError
+        Call ColEx(col_).SingleOrDefaultBy("abc", cexEqual, 2)
+        Call .AssertHasError
+        Call ColEx(col_).SingleBy
+        Call .AssertHasError
+        Call ColEx(col_).SingleOrDefaultBy
+        Call .AssertHasError
+        Call ColEx(col).SingleBy
+        Call .AssertHasError
+        Call .AssertTrue(ColEx(col).SingleOrDefaultBy(, , , Nothing) Is Nothing)
+                    
+        Set col = New Collection
+        Call col.Add(cls.Create(1))
+        Call .AssertEqual(cls.Create(1), ColEx(col).SingleBy)
+        Call .AssertEqual(cls.Create(1), ColEx(col).SingleOrDefaultBy)
+
     End With
 End Sub
 
@@ -229,6 +273,49 @@ Sub Test_Order()
         Set res = ColEx(col).OrderByDescending("abc").OrderBy("abc").Items
         Call .AssertEqual(col(1).abc, res(1).abc)
         Call .AssertEqual(col(col.Count).abc, res(res.Count).abc)
+    End With
+        
+End Sub
+
+'[Fact]
+Sub Test_Contains()
+    
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+    
+    With UnitTest.NameOf("Contains")
+        Call .AssertTrue(ColEx(col).Contains(cls.Create(2)))
+        Call .AssertFalse(ColEx(col).Contains(cls.Create(7)))
+    End With
+End Sub
+
+
+'[Fact]
+Sub Test_Distinct()
+    
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(5))
+    
+    Dim res As Collection
+    With UnitTest
+        Call .NameOf("Distinct")
+        Set res = ColEx(col).Distinct().Items
+        Call .AssertEqual(4, res.Count)
+        Call .AssertEqual(1, ColEx(col).Distinct().Where("abc", cexEqual, 1).Count)
+        
+        Call .NameOf("DistinctBy")
+        Set res = ColEx(col).DistinctBy("def").Items
+        Call .AssertEqual(4, res.Count)
+        Call .AssertEqual(7, ColEx(col).SelectManyBy("Defs").DistinctBy("def").Count)
     End With
         
 End Sub
