@@ -76,7 +76,7 @@ Simplified and Faster CollectionEx
     - AnyBy(), AllBy()
     - Take(), Skip()
     - OrderBy(), OrderByDescending()
-    - Contains() 
+    - Contains(), Distinct(), DistinctBy()
 
 <br>
  * If comparing objects as equal, objects should has Equals() function. if not has, raise error. <br>
