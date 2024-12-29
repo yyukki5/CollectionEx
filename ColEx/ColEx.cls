@@ -11,13 +11,13 @@ Option Explicit On
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.3.0 (developing)
+' Version: 0.3.1 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
 Private items_ As Collection
 
-Public Enum Operators
+Public Enum cexOperators
     cexEqual
     cexIs
     cexIsNot
@@ -83,7 +83,7 @@ End Function
 
 
 Public Function Where(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant) As ColEx
     Dim c As Variant, col As Collection, recol As New ColEx
     Set col = New Collection
@@ -122,7 +122,7 @@ End Function
 
 
 Public Function First(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant)
     Dim i As Long
     If items_.Count = 0 Then Call Err.Raise(9001, "ColEx.First()", "The sequence is empty")
@@ -136,7 +136,7 @@ Public Function First(Optional property_name As String, _
 End Function
 
 Public Function FirstOrDefault(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant, _
                       Optional default_value As Variant = Null)
     Dim i As Long
@@ -151,7 +151,7 @@ Public Function FirstOrDefault(Optional property_name As String, _
 End Function
 
 Public Function Last(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant)
     Dim i As Long
     If items_.Count = 0 Then Call Err.Raise(9001, "ColEx.Last()", "The sequence is empty")
@@ -165,7 +165,7 @@ Public Function Last(Optional property_name As String, _
 End Function
 
 Public Function LastOrDefault(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant, _
                       Optional default_value As Variant = Null)
     Dim i As Long
@@ -180,7 +180,7 @@ Public Function LastOrDefault(Optional property_name As String, _
 End Function
 
 Public Function SingleBy(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant)
     Dim i As Long, f As Boolean
     If IsMissing(compare_value) Then
@@ -204,7 +204,7 @@ Public Function SingleBy(Optional property_name As String, _
 End Function
 
 Public Function SingleOrDefaultBy(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant, _
                       Optional default_value As Variant = Null)
     Dim i As Long, f As Boolean
@@ -253,7 +253,7 @@ End Function
 
 
 Public Function AllBy(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant) As Boolean
     Dim c
     
@@ -266,7 +266,7 @@ Public Function AllBy(Optional property_name As String, _
 End Function
 
 Public Function AnyBy(Optional property_name As String, _
-                      Optional compare_operator As Operators, _
+                      Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant) As Boolean
     Dim c
     
@@ -346,31 +346,31 @@ End Function
 
 
 ' private functions --------------------------------
-Private Function Compare(compared_value As Variant, compare_operator As Operators, Optional compare_value As Variant = Null)
+Private Function Compare(compared_value As Variant, compare_operator As cexOperators, Optional compare_value As Variant = Null)
     If IsNull(compare_value) Then
     
     Else
         Select Case compare_operator
-            Case Operators.cexEqual
+            Case cexOperators.cexEqual
                 Compare = Equals(compare_value, compared_value)
-            Case Operators.cexGreaterThan
+            Case cexOperators.cexGreaterThan
                 Compare = (compared_value > compare_value)
-            Case Operators.cexGreaterThanOrEqualTo
+            Case cexOperators.cexGreaterThanOrEqualTo
                 Compare = (compared_value >= compare_value)
-            Case Operators.cexLessThan
+            Case cexOperators.cexLessThan
                 Compare = (compared_value < compare_value)
-            Case Operators.cexLessThanOrEqualTo
+            Case cexOperators.cexLessThanOrEqualTo
                 Compare = (compared_value <= compare_value)
             
-            Case Operators.cexIs
+            Case cexOperators.cexIs
                 Compare = (compared_value Is compare_value)
-            Case Operators.cexIsNot
+            Case cexOperators.cexIsNot
                 Compare = (compared_value Is Not compare_value)
         End Select
     End If
 End Function
 
-Private Function Compare2(c As Variant, property_name As String, compare_operator As Operators, compare_value As Variant) As Boolean
+Private Function Compare2(c As Variant, property_name As String, compare_operator As cexOperators, compare_value As Variant) As Boolean
     If property_name = "" Then
         If Compare(c, compare_operator, compare_value) Then Compare2 = True
     Else
