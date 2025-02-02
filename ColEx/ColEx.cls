@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Option Explicit On
+Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.3.1 (developing)
+' Version: 0.4.0 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -19,6 +19,7 @@ Private items_ As Collection
 
 Public Enum cexOperators
     cexEqual
+    cexDoesNotEqual
     cexIs
     cexIsNot
     cexGreaterThan
@@ -96,12 +97,16 @@ Public Function Where(Optional property_name As String, _
 End Function
 
 
-Public Function SelectBy(property_name As String) As ColEx
+Public Function SelectBy(property_name As String, Optional call_type As VbCallType = VbGet, Optional any_parameters) As ColEx
     Dim c As Variant, col As Collection, recol As New ColEx
     Set col = New Collection
     
     For Each c In items_
-        Call col.Add(CallByName(c, property_name, VbGet))
+        If IsMissing(any_parameters) Then
+            Call col.Add(CallByName(c, property_name, call_type))
+        Else
+            Call col.Add(CallByName(c, property_name, call_type, any_parameters))
+        End If
     Next
     
     Set SelectBy = recol.Initialize(col)
@@ -344,6 +349,34 @@ Public Function ToArray()
     ToArray = arr
 End Function
 
+Public Function ToArray2D(ParamArray property_names())
+    Dim arr, i As Long, j As Long, cnt As Long, p As Variant, ps As Variant, l As Long, u As Long
+    
+    ps = property_names
+    cnt = UBound(property_names) - LBound(property_names)
+    
+    If UBound(property_names()) = 0 Then
+        If IsArray(property_names(0)) Then
+            ps = property_names(0)
+            cnt = UBound(property_names(0)) - LBound(property_names(0))
+        ElseIf TypeOf property_names(0) Is Collection Then
+            Set ps = property_names(0)
+            cnt = ps.Count - 1
+        End If
+    End If
+        
+    ReDim arr(0 To items_.Count - 1, 0 To cnt)
+    For i = LBound(arr, 1) To UBound(arr, 1)
+        j = 0
+        For Each p In ps
+            Call SetObjectAsBuffer(CallByName(items_.Item(i + 1), p, VbGet), arr(i, j))
+            j = j + 1
+        Next
+    Next i
+    
+    ToArray2D = arr
+End Function
+
 
 ' private functions --------------------------------
 Private Function Compare(compared_value As Variant, compare_operator As cexOperators, Optional compare_value As Variant = Null)
@@ -353,6 +386,8 @@ Private Function Compare(compared_value As Variant, compare_operator As cexOpera
         Select Case compare_operator
             Case cexOperators.cexEqual
                 Compare = Equals(compare_value, compared_value)
+            Case cexOperators.cexDoesNotEqual
+                Compare = (Equals(compare_value, compared_value) = False)
             Case cexOperators.cexGreaterThan
                 Compare = (compared_value > compare_value)
             Case cexOperators.cexGreaterThanOrEqualTo

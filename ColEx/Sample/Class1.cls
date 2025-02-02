@@ -16,6 +16,9 @@ Private def_ As Class2
 Property Get abc()
     abc = abc_
 End Property
+Property Let abc(v)
+    abc_ = v
+End Property
 Property Get def()
     Set def = def_
 End Property
@@ -48,3 +51,4 @@ Public Function Create(a) As Class1
     Dim cls1 As New Class1
     Set Create = cls1.Init(a)
 End Function
+

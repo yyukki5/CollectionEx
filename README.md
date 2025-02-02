@@ -62,8 +62,7 @@ Simplified and Faster CollectionEx
         Debug.Print v.Prop1
     Next
 
-    Dim cex as New ColEx
-    Call cex.Initialize(col)
+    Call ColEx(Sheet1.Range("A1:A10")).Where("Value", cexEqual, Empty).SelectBy("Delete", VbMethod)
 ~~~
 
 ## Features
@@ -90,7 +89,7 @@ CollectionEx を簡略化、軽量化したもの。（Lambda を使っていな
 
 - 要素の直下のプロパティを使ってWhereしたり、Selectしたり出来る  
 - 2階層以降のプロパティにはアクセスできないので For Each を使う  
-- メソッドを使う場合は、ForEachを利用するか、CollectionExを使う
+- SelectBy() を除き、メソッドを使う場合は、ForEachを利用するか、CollectionExを使う 
 - デフォルトメソッドはCreate()
 
 <br>
