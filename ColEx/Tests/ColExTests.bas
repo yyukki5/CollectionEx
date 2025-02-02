@@ -32,6 +32,7 @@ Sub RunTests()
     test.RegisterTest "Test_Add"
     test.RegisterTest "Test_Where"
     test.RegisterTest "Test_SelectBy"
+    test.RegisterTest "Test_SelectBy_NotGet"
     test.RegisterTest "Test_SelectManyBy"
     test.RegisterTest "Test_AnyAll"
     test.RegisterTest "Test_TakeSkip"
@@ -39,6 +40,7 @@ Sub RunTests()
     test.RegisterTest "Test_Order"
     test.RegisterTest "Test_Contains"
     test.RegisterTest "Test_Distinct"
+    test.RegisterTest "Test_ToArray"
 
     test.RunTests UnitTest
 End Sub
@@ -140,6 +142,20 @@ Sub Test_SelectBy()
         Call .AssertEqual(8, ColEx(col_).SelectBy("abc").Count)
         Call .AssertEqual(1, ColEx(col_).SelectBy("abc").Items(1))
         Call .AssertEqual(2, ColEx(col_).SelectBy("def").Items(1).def)
+    End With
+End Sub
+
+'[Fact]
+Sub Test_SelectBy_NotGet()
+    TestInitialize
+        
+    Dim res As ColEx
+    With UnitTest.NameOf("SelectBy for Method/Let/Set")
+        Call .AssertEqual(8, ColEx(col_).SelectBy("Create", VbMethod, 1).Count)
+        Call .AssertEqual(1, ColEx(col_).SelectBy("Create", VbMethod, 1).Items(1).abc)
+    
+        Call .AssertEqual(8, ColEx(col_).SelectBy("abc", VbLet, 5).Count)
+        Call .AssertEqual(5, col_(1).abc)
     End With
 End Sub
 

@@ -97,12 +97,16 @@ Public Function Where(Optional property_name As String, _
 End Function
 
 
-Public Function SelectBy(property_name As String) As ColEx
+Public Function SelectBy(property_name As String, Optional call_type As VbCallType = VbGet, Optional any_parameters) As ColEx
     Dim c As Variant, col As Collection, recol As New ColEx
     Set col = New Collection
     
     For Each c In items_
-        Call col.Add(CallByName(c, property_name, VbGet))
+        If IsMissing(any_parameters) Then
+            Call col.Add(CallByName(c, property_name, call_type))
+        Else
+            Call col.Add(CallByName(c, property_name, call_type, any_parameters))
+        End If
     Next
     
     Set SelectBy = recol.Initialize(col)
