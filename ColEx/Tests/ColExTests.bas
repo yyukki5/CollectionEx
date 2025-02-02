@@ -123,6 +123,7 @@ Sub Test_Where()
     With UnitTest
         Call .AssertEqual(1, ColEx(col_).Where("abc", cexEqual, 1).Count)
         Call .AssertEqual(3, ColEx(col_).Where("abc", cexEqual, 2).Count)
+        Call .AssertEqual(5, ColEx(col_).Where("abc", cexDoesNotEqual, 2).Count)
         Call .AssertEqual(2, ColEx(col_).Where("abc", cexGreaterThan, 3).Count)
         Call .AssertEqual(4, ColEx(col_).Where("abc", cexGreaterThanOrEqualTo, 3).Count)
         Call .AssertEqual(4, ColEx(col_).Where("abc", cexLessThan, 3).Count)
