@@ -320,3 +320,62 @@ Sub Test_Distinct()
     End With
         
 End Sub
+
+'[Fact]
+Sub Test_ToArray()
+    
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(5))
+    
+    Dim res As Variant
+    With UnitTest
+        Call .NameOf("ToArray")
+        res = ColEx(col).ToArray()
+        Call .AssertTrue(IsArray(res))
+        Call .AssertEqual(4, UBound(res))
+        Call .AssertEqual(0, LBound(res))
+
+        Call .NameOf("ToArray2D, param array")
+        res = ColEx(col).ToArray2D("abc", "def")
+        Call .AssertTrue(IsArray(res))
+        Call .AssertEqual(4, UBound(res, 1))
+        Call .AssertEqual(0, LBound(res, 1))
+        Call .AssertEqual(1, UBound(res, 2))
+        Call .AssertEqual(0, LBound(res, 2))
+        Call .AssertEqual(1, res(0, 0))
+        Call .AssertEqual(5, res(4, 0))
+                
+        Call .NameOf("ToArray2D, by collection")
+        Dim col_names As New Collection
+        Call col_names.Add("abc")
+        Call col_names.Add("def")
+        res = ColEx(col).ToArray2D(col_names)
+        Call .AssertTrue(IsArray(res))
+        Call .AssertEqual(4, UBound(res, 1))
+        Call .AssertEqual(0, LBound(res, 1))
+        Call .AssertEqual(1, UBound(res, 2))
+        Call .AssertEqual(0, LBound(res, 2))
+        Call .AssertEqual(1, res(0, 0))
+        Call .AssertEqual(5, res(4, 0))
+        
+        Call .NameOf("ToArray2D, by array")
+        Dim arr_names As Variant
+        arr_names = Array("abc", "def")
+        res = ColEx(col).ToArray2D(arr_names)
+        Call .AssertTrue(IsArray(res))
+        Call .AssertEqual(4, UBound(res, 1))
+        Call .AssertEqual(0, LBound(res, 1))
+        Call .AssertEqual(1, UBound(res, 2))
+        Call .AssertEqual(0, LBound(res, 2))
+        Call .AssertEqual(1, res(0, 0))
+        Call .AssertEqual(5, res(4, 0))
+
+    End With
+        
+End Sub
+

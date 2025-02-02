@@ -345,6 +345,34 @@ Public Function ToArray()
     ToArray = arr
 End Function
 
+Public Function ToArray2D(ParamArray property_names())
+    Dim arr, i As Long, j As Long, cnt As Long, p As Variant, ps As Variant, l As Long, u As Long
+    
+    ps = property_names
+    cnt = UBound(property_names) - LBound(property_names)
+    
+    If UBound(property_names()) = 0 Then
+        If IsArray(property_names(0)) Then
+            ps = property_names(0)
+            cnt = UBound(property_names(0)) - LBound(property_names(0))
+        ElseIf TypeOf property_names(0) Is Collection Then
+            Set ps = property_names(0)
+            cnt = ps.Count - 1
+        End If
+    End If
+        
+    ReDim arr(0 To items_.Count - 1, 0 To cnt)
+    For i = LBound(arr, 1) To UBound(arr, 1)
+        j = 0
+        For Each p In ps
+            Call SetObjectAsBuffer(CallByName(items_.Item(i + 1), p, VbGet), arr(i, j))
+            j = j + 1
+        Next
+    Next i
+    
+    ToArray2D = arr
+End Function
+
 
 ' private functions --------------------------------
 Private Function Compare(compared_value As Variant, compare_operator As cexOperators, Optional compare_value As Variant = Null)
