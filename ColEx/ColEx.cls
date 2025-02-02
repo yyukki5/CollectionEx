@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Option Explicit On
+Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.3.1 (developing)
+' Version: 0.4.0 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -19,6 +19,7 @@ Private items_ As Collection
 
 Public Enum cexOperators
     cexEqual
+    cexDoesNotEqual
     cexIs
     cexIsNot
     cexGreaterThan
@@ -353,6 +354,8 @@ Private Function Compare(compared_value As Variant, compare_operator As cexOpera
         Select Case compare_operator
             Case cexOperators.cexEqual
                 Compare = Equals(compare_value, compared_value)
+            Case cexOperators.cexDoesNotEqual
+                Compare = (Equals(compare_value, compared_value) = False)
             Case cexOperators.cexGreaterThan
                 Compare = (compared_value > compare_value)
             Case cexOperators.cexGreaterThanOrEqualTo
