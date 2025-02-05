@@ -340,41 +340,44 @@ End Function
 
 
 ' private functions --------------------------------
-Private Function QuickSort(ByRef cex As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, lambda_string As String) As Collection
-    Dim i As Long, j As Long, pivot As Variant, temp, Lam As Collection, col As Collection
+Private Function QuickSort(ByRef cex As CollectionEx, ByVal low_boundary As Long, ByVal up_boundary As Long, is_asc As Boolean, lambda_string As String) As Collection
+    Dim i As Long, j As Long, pivot As Variant, temp, property_col As Collection, col As Collection
     
-    Set Lam = cex.SelectBy(lambda_string).Items
+    If cex.Items.Count <= 1 Then Set QuickSort = cex.Items: Exit Function
+    Set property_col = cex.SelectBy(lambda_string).Items
     Set col = cex.Items
-    i = low
-    j = up
-    pivot = Lam(Round((low + up) \ 2, 0))
+    i = low_boundary
+    j = up_boundary
+    pivot = property_col(Round((low_boundary + up_boundary) \ 2, 0) + 1)
     
     Do While i <= j
-        If isAsc Then
-            Do While Lam(i) < pivot: i = i + 1: If i > up Then Exit Do:
+        If is_asc Then
+            Do While property_col(i) < pivot : i = i + 1 : If i > up_boundary Then Exit Do : 
             Loop
-            Do While Lam(j) > pivot: j = j - 1: If j < low Then Exit Do:
+            Do While property_col(j) > pivot : j = j - 1 : If j < low_boundary Then Exit Do : 
             Loop
         Else
-            Do While Lam(i) > pivot: i = i + 1: If i > up Then Exit Do:
+            Do While property_col(i) > pivot : i = i + 1 : If i > up_boundary Then Exit Do : 
             Loop
-            Do While Lam(j) < pivot: j = j - 1: If j < low Then Exit Do:
+            Do While property_col(j) < pivot : j = j - 1 : If j < low_boundary Then Exit Do : 
             Loop
         End If
         If i <= j Then
 
             If IsObject(col(i)) Then Set temp = col(i) Else temp = col(i)
-            col.Add col(j), Before:=i
-            col.Remove i + 1
-            col.Add temp, Before:=j
-            col.Remove j + 1
+            Call col.Add(col(j), Before:=i)
+            Call col.Remove(i + 1)
+            Call col.Add(temp, Before:=j)
+            Call col.Remove(j + 1)
             i = i + 1
             j = j - 1
         End If
     Loop
+
     Call cex.Initialize(col)
-    If low < j Then Call QuickSort(cex, low, j, isAsc, lambda_string)
-    If i < up Then Call QuickSort(cex, i, up, isAsc, lambda_string)
+    If low_boundary < j Then Call QuickSort(cex, low_boundary, j, is_asc, lambda_string)
+    If i < up_boundary Then Call QuickSort(cex, i, up_boundary, is_asc, lambda_string)
+    
     Set QuickSort = cex.Items
 End Function
 
