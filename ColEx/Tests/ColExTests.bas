@@ -38,6 +38,7 @@ Sub RunTests()
     test.RegisterTest "Test_TakeSkip"
     test.RegisterTest "Test_FirstLast"
     test.RegisterTest "Test_Order"
+    test.RegisterTest "Test_Order_ByValue"
     test.RegisterTest "Test_Contains"
     test.RegisterTest "Test_Distinct"
     test.RegisterTest "Test_ToArray"
@@ -148,7 +149,7 @@ End Sub
 '[Fact]
 Sub Test_SelectBy_NotGet()
     TestInitialize
-        
+                
     Dim res As ColEx
     With UnitTest.NameOf("SelectBy for Method/Let/Set")
         Call .AssertEqual(8, ColEx(col_).SelectBy("Create", VbMethod, 1).Count)
@@ -280,16 +281,138 @@ Sub Test_Order()
     Call col.Add(cls.Create(5))
     
     Dim res As Collection
-    With UnitTest
+    With UnitTest.NameOf("Order Class1 ")
+        Set res = ColEx(col).OrderBy("abc").Items
+        Call .AssertTrue(res(1).abc <= res(2).abc)
+        Call .AssertTrue(res(2).abc <= res(3).abc)
+        Call .AssertTrue(res(3).abc <= res(4).abc)
+        Call .AssertTrue(res(4).abc <= res(5).abc)
+        Call .AssertTrue(res(5).abc <= res(6).abc)
+        
         Set res = ColEx(col).OrderByDescending("abc").Items
         Call .AssertTrue(res(1).abc >= res(2).abc)
         Call .AssertTrue(res(2).abc >= res(3).abc)
         Call .AssertTrue(res(3).abc >= res(4).abc)
         Call .AssertTrue(res(4).abc >= res(5).abc)
+        Call .AssertTrue(res(5).abc >= res(6).abc)
         
         Set res = ColEx(col).OrderByDescending("abc").OrderBy("abc").Items
         Call .AssertEqual(col(1).abc, res(1).abc)
         Call .AssertEqual(col(col.Count).abc, res(res.Count).abc)
+    End With
+        
+End Sub
+
+'[Fact]
+Sub Test_Order_ByValue()
+    Dim col As Collection
+    Dim res As Collection
+    With UnitTest.NameOf("Order asc/desc of Int even")
+        Set res = ColEx(GetIntCollection).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        
+        Set res = ColEx(GetIntCollection).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+    End With
+        
+    
+    Set col = GetIntCollection: Call col.Add(9)
+    With UnitTest.NameOf("Order asc/desc of Int odd")
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        Call .AssertTrue(res(8) <= res(9))
+        
+        Set res = ColEx(col).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+        Call .AssertTrue(res(8) >= res(9))
+    End With
+    
+    
+    With UnitTest.NameOf("Order asc/desc of String even")
+        Set res = ColEx(GetStringCollection).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        
+        Set res = ColEx(GetStringCollection).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+    End With
+        
+    Set col = GetStringCollection: Call col.Add("ccc")
+    With UnitTest.NameOf("Order asc/desc of String odd")
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        Call .AssertTrue(res(8) <= res(9))
+        
+        Set res = ColEx(col).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+        Call .AssertTrue(res(8) >= res(9))
+    End With
+        
+    
+    With UnitTest.NameOf("Order asc/desc, 2 elements order")
+        Set col = New Collection
+        Call col.Add(2)
+        Call col.Add(1)
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+    End With
+    With UnitTest.NameOf("Order asc/desc, 1 elements return self")
+        Set col = New Collection
+        Call col.Add(1)
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertEqual(1, res.Count)
+    End With
+    With UnitTest.NameOf("Order asc/desc, 0 elements return empty collection")
+        Set col = New Collection
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertEqual(0, res.Count)
     End With
         
 End Sub
@@ -395,3 +518,46 @@ Sub Test_ToArray()
         
 End Sub
 
+
+Private Function GetClass1Collection()
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(5))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+
+    Set GetClass1Collection = col
+End Function
+
+Private Function GetIntCollection()
+    Dim col As New Collection
+    Call col.Add(1)
+    Call col.Add(2)
+    Call col.Add(3)
+    Call col.Add(4)
+    Call col.Add(5)
+    Call col.Add(2)
+    Call col.Add(2)
+    Call col.Add(3)
+
+    Set GetIntCollection = col
+End Function
+
+Private Function GetStringCollection()
+    Dim col As New Collection
+    Call col.Add("aaa")
+    Call col.Add("aab")
+    Call col.Add("aac")
+    Call col.Add("aba")
+    Call col.Add("caa")
+    Call col.Add("cba")
+    Call col.Add("aaa")
+    Call col.Add("aab")
+
+    Set GetStringCollection = col
+End Function
