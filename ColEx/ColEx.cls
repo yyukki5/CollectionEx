@@ -294,12 +294,12 @@ Public Function Contains(compare_item As Variant) As Boolean
 End Function
 
 
-Public Function OrderBy(property_name As String) As ColEx
+Public Function OrderBy(Optional property_name As String) As ColEx
     Set OrderBy = New ColEx
     Call OrderBy.Initialize(QuickSort(items_, 1, items_.Count, True, property_name))
 End Function
 
-Public Function OrderByDescending(property_name As String) As ColEx
+Public Function OrderByDescending(Optional property_name As String) As ColEx
     Set OrderByDescending = New ColEx
     Call OrderByDescending.Initialize(QuickSort(items_, 1, items_.Count, False, property_name))
 End Function
@@ -423,6 +423,7 @@ Private Function QuickSort(ByRef col As Collection, _
     Dim property_col As Collection, sorting_col As Collection
     
     Set property_col = ColEx(col).SelectBy(property_name).Items
+    If property_name = "" Then Set property_col = col Else Set property_col = ColEx(col).SelectBy(property_name).Items
     Set sorting_col = ColEx(col).Items
     i = low_boundary
     j = up_boundary
