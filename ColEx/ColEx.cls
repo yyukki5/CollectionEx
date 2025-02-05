@@ -422,12 +422,12 @@ Private Function QuickSort(ByRef col As Collection, _
     Dim i As Long, j As Long, pivot As Variant, temp As Variant
     Dim property_col As Collection, sorting_col As Collection
     
-    Set property_col = ColEx(col).SelectBy(property_name).Items
+    If col.Count <= 1 Then Set QuickSort = col: Exit Function
     If property_name = "" Then Set property_col = col Else Set property_col = ColEx(col).SelectBy(property_name).Items
     Set sorting_col = ColEx(col).Items
     i = low_boundary
     j = up_boundary
-    pivot = property_col(Round((low_boundary + up_boundary) \ 2, 0))
+    pivot = property_col(Round((low_boundary + up_boundary) \ 2, 0) + 1)
     
     Do While i <= j
         If is_asc Then
