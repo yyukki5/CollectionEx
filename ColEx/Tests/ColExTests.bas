@@ -42,6 +42,9 @@ Sub RunTests()
     test.RegisterTest "Test_Contains"
     test.RegisterTest "Test_Distinct"
     test.RegisterTest "Test_ToArray"
+    test.RegisterTest "Test_MinMax_Value"
+    test.RegisterTest "Test_MinMax_Object"
+    test.RegisterTest "Test_MinByMaxBy_Object"
 
     test.RunTests UnitTest
 End Sub
@@ -516,7 +519,7 @@ Sub Test_MinMax_Value()
     Call col.Add(5)
     Call col.Add(4)
     Call col.Add(3)
-    
+        
     ' Act/Assert
     With UnitTest.NameOf("Min/Max (Value)")
         Call .AssertEqual(1, ColEx(col).Min())
@@ -545,6 +548,27 @@ Sub Test_MinMax_Object()
         
 End Sub
 
+'[Fact]
+Sub Test_MinByMaxBy_Object()
+    
+    ' Arrange
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(5))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(3))
+    
+    ' Act/Assert
+    With UnitTest.NameOf("MinBy/MaxBy")
+        Call .AssertTrue(TypeOf ColEx(col).MinBy("abc") Is Class1)
+        Call .AssertEqual(1, ColEx(col).MinBy("abc").abc)
+        Call .AssertTrue(TypeOf ColEx(col).MaxBy("abc") Is Class1)
+        Call .AssertEqual(5, ColEx(col).MaxBy("abc").abc)
+    End With
+        
+End Sub
 
 Private Function GetClass1Collection()
     Dim cls As New Class1
