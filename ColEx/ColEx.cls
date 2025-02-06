@@ -362,19 +362,19 @@ Public Function DistinctBy(property_name As String) As ColEx
 End Function
 
 Public Function Max(Optional property_name As String) As Variant
-    Dim c As Variant, v As Variant, tmp As Variant
+    Dim v As Variant, tmp As Variant, i As Long
     
     If items_.Count = 0 Then Max = Null: Exit Function
     
     If property_name = "" Then
         tmp = items_(1)
-        For Each c In items_
-            If c > tmp Then tmp = c
+        For i = 2 To items_.Count
+            If items_(i) > tmp Then tmp = items_(i)
         Next
     Else
         tmp = CallByName(items_(1), property_name, VbGet)
-        For Each c In items_
-            v = CallByName(c, property_name, VbGet)
+        For i = 2 To items_.Count
+            v = CallByName(items_(i), property_name, VbGet)
             If v > tmp Then tmp = v
         Next
     End If
@@ -383,19 +383,19 @@ Public Function Max(Optional property_name As String) As Variant
 End Function
 
 Public Function Min(Optional property_name As String) As Variant
-    Dim c As Variant, v As Variant, tmp As Variant
+    Dim v As Variant, tmp As Variant, i As Long
     
     If items_.Count = 0 Then Min = Null: Exit Function
     
     If property_name = "" Then
         tmp = items_(1)
-        For Each c In items_
-            If c < tmp Then tmp = c
+        For i = 2 To items_.Count
+            If items_(i) < tmp Then tmp = items_(i)
         Next
     Else
         tmp = CallByName(items_(1), property_name, VbGet)
-        For Each c In items_
-            v = CallByName(c, property_name, VbGet)
+        For i = 2 To items_.Count
+            v = CallByName(items_(i), property_name, VbGet)
             If v < tmp Then tmp = v
         Next
     End If
@@ -404,7 +404,7 @@ Public Function Min(Optional property_name As String) As Variant
 End Function
 
 Public Function MaxBy(property_name As String) As Variant
-    Dim c As Variant, v As Variant, temp_value As Variant, temp_item As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
     
     If items_.Count = 0 Then Set MaxBy = Nothing: Exit Function
     If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MaxBy()", "Elements should be object.")
@@ -412,11 +412,11 @@ Public Function MaxBy(property_name As String) As Variant
     temp_value = CallByName(items_(1), property_name, VbGet)
     Set temp_item = items_(1)
     
-    For Each c In items_
-        v = CallByName(c, property_name, VbGet)
+    For i = 2 To items_.Count
+        v = CallByName(items_(i), property_name, VbGet)
         If v > temp_value Then
             temp_value = v
-            Set temp_item = c
+            Set temp_item = items_(i)
         End If
     Next
     
@@ -424,7 +424,7 @@ Public Function MaxBy(property_name As String) As Variant
 End Function
 
 Public Function MinBy(property_name As String) As Variant
-    Dim c As Variant, v As Variant, temp_value As Variant, temp_item As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
     
     If items_.Count = 0 Then Set MinBy = Nothing: Exit Function
     If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MinBy()", "Elements should be object.")
@@ -432,11 +432,11 @@ Public Function MinBy(property_name As String) As Variant
     temp_value = CallByName(items_(1), property_name, VbGet)
     Set temp_item = items_(1)
     
-    For Each c In items_
-        v = CallByName(c, property_name, VbGet)
+    For i = 2 To items_.Count
+        v = CallByName(items_(i), property_name, VbGet)
         If v < temp_value Then
             temp_value = v
-            Set temp_item = c
+            Set temp_item = items_(i)
         End If
     Next
     
