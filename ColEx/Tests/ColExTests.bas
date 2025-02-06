@@ -38,9 +38,13 @@ Sub RunTests()
     test.RegisterTest "Test_TakeSkip"
     test.RegisterTest "Test_FirstLast"
     test.RegisterTest "Test_Order"
+    test.RegisterTest "Test_Order_ByValue"
     test.RegisterTest "Test_Contains"
     test.RegisterTest "Test_Distinct"
     test.RegisterTest "Test_ToArray"
+    test.RegisterTest "Test_MinMax_Value"
+    test.RegisterTest "Test_MinMax_Object"
+    test.RegisterTest "Test_MinByMaxBy_Object"
 
     test.RunTests UnitTest
 End Sub
@@ -51,24 +55,11 @@ Sub Test_SpeedTest()
     Dim i As Long, n
     Dim cls As New Class1
     n = Timer
-    For i = 1 To 10000
-        Call ColEx(col_).Where("abc", cexEqual, 2)
-    Next i
+'    Call ColEx(GetClass1CollectionN(10000)).OrderBy("abc")
+    Call ColEx(GetClass1CollectionN(100000)).Where("abc", cexEqual, 2)
     Debug.Print "Done. " & Format((Timer - n), "0.00") & "[s]"
 End Sub
 
-
-Sub aaaa()
-
-    Dim cex As ColEx
-    Set cex = ColEx(Array(1, 2, 3, 4, 5))
-    
-    Dim aa As Variant
-    For Each aa In cex
-        Debug.Print aa
-    Next
-    
-End Sub
 
 '[Fact]
 Sub Test_Initialize_Create_Enum()
@@ -148,7 +139,7 @@ End Sub
 '[Fact]
 Sub Test_SelectBy_NotGet()
     TestInitialize
-        
+                
     Dim res As ColEx
     With UnitTest.NameOf("SelectBy for Method/Let/Set")
         Call .AssertEqual(8, ColEx(col_).SelectBy("Create", VbMethod, 1).Count)
@@ -280,16 +271,138 @@ Sub Test_Order()
     Call col.Add(cls.Create(5))
     
     Dim res As Collection
-    With UnitTest
+    With UnitTest.NameOf("Order Class1 ")
+        Set res = ColEx(col).OrderBy("abc").Items
+        Call .AssertTrue(res(1).abc <= res(2).abc)
+        Call .AssertTrue(res(2).abc <= res(3).abc)
+        Call .AssertTrue(res(3).abc <= res(4).abc)
+        Call .AssertTrue(res(4).abc <= res(5).abc)
+        Call .AssertTrue(res(5).abc <= res(6).abc)
+        
         Set res = ColEx(col).OrderByDescending("abc").Items
         Call .AssertTrue(res(1).abc >= res(2).abc)
         Call .AssertTrue(res(2).abc >= res(3).abc)
         Call .AssertTrue(res(3).abc >= res(4).abc)
         Call .AssertTrue(res(4).abc >= res(5).abc)
+        Call .AssertTrue(res(5).abc >= res(6).abc)
         
         Set res = ColEx(col).OrderByDescending("abc").OrderBy("abc").Items
         Call .AssertEqual(col(1).abc, res(1).abc)
         Call .AssertEqual(col(col.Count).abc, res(res.Count).abc)
+    End With
+        
+End Sub
+
+'[Fact]
+Sub Test_Order_ByValue()
+    Dim col As Collection
+    Dim res As Collection
+    With UnitTest.NameOf("Order asc/desc of Int even")
+        Set res = ColEx(GetIntCollection).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        
+        Set res = ColEx(GetIntCollection).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+    End With
+        
+    
+    Set col = GetIntCollection: Call col.Add(9)
+    With UnitTest.NameOf("Order asc/desc of Int odd")
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        Call .AssertTrue(res(8) <= res(9))
+        
+        Set res = ColEx(col).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+        Call .AssertTrue(res(8) >= res(9))
+    End With
+    
+    
+    With UnitTest.NameOf("Order asc/desc of String even")
+        Set res = ColEx(GetStringCollection).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        
+        Set res = ColEx(GetStringCollection).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+    End With
+        
+    Set col = GetStringCollection: Call col.Add("ccc")
+    With UnitTest.NameOf("Order asc/desc of String odd")
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+        Call .AssertTrue(res(2) <= res(3))
+        Call .AssertTrue(res(3) <= res(4))
+        Call .AssertTrue(res(4) <= res(5))
+        Call .AssertTrue(res(5) <= res(6))
+        Call .AssertTrue(res(6) <= res(7))
+        Call .AssertTrue(res(7) <= res(8))
+        Call .AssertTrue(res(8) <= res(9))
+        
+        Set res = ColEx(col).OrderByDescending().Items
+        Call .AssertTrue(res(1) >= res(2))
+        Call .AssertTrue(res(2) >= res(3))
+        Call .AssertTrue(res(3) >= res(4))
+        Call .AssertTrue(res(4) >= res(5))
+        Call .AssertTrue(res(5) >= res(6))
+        Call .AssertTrue(res(6) >= res(7))
+        Call .AssertTrue(res(7) >= res(8))
+        Call .AssertTrue(res(8) >= res(9))
+    End With
+        
+    
+    With UnitTest.NameOf("Order asc/desc, 2 elements order")
+        Set col = New Collection
+        Call col.Add(2)
+        Call col.Add(1)
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertTrue(res(1) <= res(2))
+    End With
+    With UnitTest.NameOf("Order asc/desc, 1 elements return self")
+        Set col = New Collection
+        Call col.Add(1)
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertEqual(1, res.Count)
+    End With
+    With UnitTest.NameOf("Order asc/desc, 0 elements return empty collection")
+        Set col = New Collection
+        Set res = ColEx(col).OrderBy().Items
+        Call .AssertEqual(0, res.Count)
     End With
         
 End Sub
@@ -395,3 +508,117 @@ Sub Test_ToArray()
         
 End Sub
 
+'[Fact]
+Sub Test_MinMax_Value()
+    
+    ' Arrange
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(2)
+    Call col.Add(1)
+    Call col.Add(5)
+    Call col.Add(4)
+    Call col.Add(3)
+        
+    ' Act/Assert
+    With UnitTest.NameOf("Min/Max (Value)")
+        Call .AssertEqual(1, ColEx(col).Min())
+        Call .AssertEqual(5, ColEx(col).Max())
+    End With
+        
+End Sub
+
+'[Fact]
+Sub Test_MinMax_Object()
+    
+    ' Arrange
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(5))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(3))
+    
+    ' Act/Assert
+    With UnitTest.NameOf("Min/Max (Object)")
+        Call .AssertEqual(1, ColEx(col).Min("abc"))
+        Call .AssertEqual(5, ColEx(col).Max("abc"))
+    End With
+        
+End Sub
+
+'[Fact]
+Sub Test_MinByMaxBy_Object()
+    
+    ' Arrange
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(5))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(3))
+    
+    ' Act/Assert
+    With UnitTest.NameOf("MinBy/MaxBy")
+        Call .AssertTrue(TypeOf ColEx(col).MinBy("abc") Is Class1)
+        Call .AssertEqual(1, ColEx(col).MinBy("abc").abc)
+        Call .AssertTrue(TypeOf ColEx(col).MaxBy("abc") Is Class1)
+        Call .AssertEqual(5, ColEx(col).MaxBy("abc").abc)
+    End With
+        
+End Sub
+
+Private Function GetClass1Collection()
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(5))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(3))
+
+    Set GetClass1Collection = col
+End Function
+
+Private Function GetClass1CollectionN(Optional n As Long = 10)
+    Dim cls As New Class1, i As Long
+    Dim col As New Collection
+    
+    For i = 1 To n
+        Call col.Add(cls.Create(i))
+    Next i
+    Set GetClass1CollectionN = col
+End Function
+
+Private Function GetIntCollection()
+    Dim col As New Collection
+    Call col.Add(1)
+    Call col.Add(2)
+    Call col.Add(3)
+    Call col.Add(4)
+    Call col.Add(5)
+    Call col.Add(2)
+    Call col.Add(2)
+    Call col.Add(3)
+
+    Set GetIntCollection = col
+End Function
+
+Private Function GetStringCollection()
+    Dim col As New Collection
+    Call col.Add("aaa")
+    Call col.Add("aab")
+    Call col.Add("aac")
+    Call col.Add("aba")
+    Call col.Add("caa")
+    Call col.Add("cba")
+    Call col.Add("aaa")
+    Call col.Add("aab")
+
+    Set GetStringCollection = col
+End Function

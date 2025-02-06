@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.10.0 (developing)
+' Version: 0.11.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
@@ -260,36 +260,119 @@ Public Function Average() As Variant
     Average = Sum / items_.Count
 End Function
 
-Public Function Max() As Variant
-    Dim c, tmp
+Public Function Max(Optional lambda_string As String) As Variant
+    Dim v As Variant, tmp As Variant, i As Long
+    
     If items_.Count = 0 Then Max = Null: Exit Function
-    tmp = Items(1)
-    For Each c In items_
-        tmp = IIf(c > tmp, c, tmp)
+    
+    If lambda_string = "" Then
+        tmp = items_(1)
+        For i = 2 To items_.Count
+            If items_(i) > tmp Then tmp = items_(i)
     Next
+    Else
+        tmp = Lambda(items_(1), lambda_string).Evaluate
+        For i = 2 To items_.Count
+            v = Lambda(items_(i), lambda_string).Evaluate
+            If v > tmp Then tmp = v
+        Next
+    End If
+    
     Max = tmp
 End Function
 
-Public Function Min() As Variant
-    Dim c, tmp
+Public Function Min(Optional lambda_string As String) As Variant
+    Dim v As Variant, tmp As Variant, i As Long
+    
     If items_.Count = 0 Then Min = Null: Exit Function
-    tmp = Items(1)
-    For Each c In items_
-        tmp = IIf(c < tmp, c, tmp)
+    
+    If lambda_string = "" Then
+        tmp = items_(1)
+        For i = 2 To items_.Count
+            If items_(i) < tmp Then tmp = items_(i)
+        Next
+    Else
+        tmp = Lambda(items_(1), lambda_string).Evaluate
+        For i = 2 To items_.Count
+            v = Lambda(items_(i), lambda_string).Evaluate
+            If v < tmp Then tmp = v
     Next
+    End If
+    
     Min = tmp
 End Function
 
+Public Function MaxBy(lambda_string As String) As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
+    
+    If items_.Count = 0 Then Set MaxBy = Nothing: Exit Function
+    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "CollectionEx.MaxBy()", "Elements should be object.")
+        
+    temp_value = Lambda(items_(1), lambda_string).Evaluate
+    Set temp_item = items_(1)
+    
+    For i = 2 To items_.Count
+        v = Lambda(items_(i), lambda_string).Evaluate
+        If v > temp_value Then
+            temp_value = v
+            Set temp_item = items_(i)
+        End If
+    Next
+    
+    Set MaxBy = temp_item
+End Function
+
+Public Function MinBy(lambda_string As String) As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
+    
+    If items_.Count = 0 Then Set MinBy = Nothing: Exit Function
+    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "CollectionEx.MinBy()", "Elements should be object.")
+        
+    temp_value = Lambda(items_(1), lambda_string).Evaluate
+    Set temp_item = items_(1)
+    
+    For i = 2 To items_.Count
+        v = Lambda(items_(i), lambda_string).Evaluate
+        If v < temp_value Then
+            temp_value = v
+            Set temp_item = items_(i)
+        End If
+    Next
+    
+    Set MinBy = temp_item
+End Function
+
+
 Public Function Orderby(lambda_string As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, sortcol As New CollectionEx
-    For Each c In items_:         col.Add c:    Next
-    Set Orderby = recol.Initialize(QuickSort(sortcol.Initialize(col), 1, items_.Count, True, lambda_string))
+    Dim col As New Collection, p As New Collection, c, recol As New CollectionEx, sort_col As New Collection
+    
+    For Each c In items_
+        Set p = New Collection
+        Call p.Add(Lambda(c, lambda_string).Evaluate, "Value")
+        Call p.Add(c, "Item")
+        Call col.Add(p)
+    Next
+    For Each c In QuickSort(col, 1, items_.Count, True)
+        Call sort_col.Add(c.Item("Item"))
+    Next
+    
+    Set Orderby = recol.Initialize(sort_col)
 End Function
 
 Public Function OrderByDescending(lambda_string As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, sortcol As New CollectionEx
-    For Each c In items_:         col.Add c:    Next
-    Set OrderByDescending = recol.Initialize(QuickSort(sortcol.Initialize(col), 1, items_.Count, False, lambda_string))
+    Dim col As New Collection, p As New Collection, c, recol As New CollectionEx, sort_col As New Collection
+    
+    For Each c In items_
+        Set p = New Collection
+        Call p.Add(Lambda(c, lambda_string).Evaluate, "Value")
+        Call p.Add(c, "Item")
+        Call col.Add(p)
+    Next
+    For Each c In QuickSort(col, 1, items_.Count, False)
+        Call sort_col.Add(c.Item("Item"))
+    Next
+    
+    Set OrderByDescending = recol.Initialize(sort_col)
 End Function
 
 
@@ -340,42 +423,42 @@ End Function
 
 
 ' private functions --------------------------------
-Private Function QuickSort(ByRef cex As CollectionEx, ByVal low As Long, ByVal up As Long, isAsc As Boolean, lambda_string As String) As Collection
-    Dim i As Long, j As Long, pivot As Variant, temp, Lam As Collection, col As Collection
+Private Function QuickSort(ByRef any_pairs As Collection, ByVal low_boundary As Long, ByVal up_boundary As Long, is_asc As Boolean) As Collection
+    Dim i As Long, j As Long, pivot As Variant, temp, property_any_pairs As New Collection
     
-    Set Lam = cex.SelectBy(lambda_string).Items
-    Set col = cex.Items
-    i = low
-    j = up
-    pivot = Lam(Round((low + up) \ 2, 0))
+    If any_pairs.Count <= 1 Then Set QuickSort = any_pairs: Exit Function
+    
+    i = low_boundary
+    j = up_boundary
+    pivot = any_pairs((low_boundary + up_boundary) \ 2).Item("Value")
     
     Do While i <= j
-        If isAsc Then
-            Do While Lam(i) < pivot: i = i + 1: If i > up Then Exit Do:
+        If is_asc Then
+            Do While any_pairs(i).Item("Value") < pivot: i = i + 1: If i > up_boundary Then Exit Do:
             Loop
-            Do While Lam(j) > pivot: j = j - 1: If j < low Then Exit Do:
+            Do While any_pairs(j).Item("Value") > pivot: j = j - 1: If j < low_boundary Then Exit Do:
             Loop
         Else
-            Do While Lam(i) > pivot: i = i + 1: If i > up Then Exit Do:
+            Do While any_pairs(i).Item("Value") > pivot: i = i + 1: If i > up_boundary Then Exit Do:
             Loop
-            Do While Lam(j) < pivot: j = j - 1: If j < low Then Exit Do:
+            Do While any_pairs(j).Item("Value") < pivot: j = j - 1: If j < low_boundary Then Exit Do:
             Loop
         End If
         If i <= j Then
-
-            If IsObject(col(i)) Then Set temp = col(i) Else temp = col(i)
-            col.Add col(j), Before:=i
-            col.Remove i + 1
-            col.Add temp, Before:=j
-            col.Remove j + 1
+            Set temp = any_pairs(i)
+            Call any_pairs.Add(any_pairs(j), Before:=i)
+            Call any_pairs.Remove(i + 1)
+            Call any_pairs.Add(temp, Before:=j)
+            Call any_pairs.Remove(j + 1)
             i = i + 1
             j = j - 1
         End If
     Loop
-    Call cex.Initialize(col)
-    If low < j Then Call QuickSort(cex, low, j, isAsc, lambda_string)
-    If i < up Then Call QuickSort(cex, i, up, isAsc, lambda_string)
-    Set QuickSort = cex.Items
+
+    If low_boundary < j Then Call QuickSort(any_pairs, low_boundary, j, is_asc)
+    If i < up_boundary Then Call QuickSort(any_pairs, i, up_boundary, is_asc)
+    
+    Set QuickSort = any_pairs
 End Function
 
 Private Function Equals(comparing_item, compared_item) As Boolean

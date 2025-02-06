@@ -11,7 +11,7 @@ Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.4.0 (developing)
+' Version: 0.5.0 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -294,14 +294,38 @@ Public Function Contains(compare_item As Variant) As Boolean
 End Function
 
 
-Public Function OrderBy(property_name As String) As ColEx
+Public Function OrderBy(Optional property_name As String) As ColEx
+    Dim col As New Collection, p As New Collection, c, sort_col As New Collection
+    
+    For Each c In items_
+        Set p = New Collection
+        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByName(c, property_name, VbGet), "Value")
+        Call p.Add(c, "Item")
+        Call col.Add(p)
+    Next
+    For Each c In QuickSort(col, 1, items_.Count, True)
+        Call sort_col.Add(c.Item("Item"))
+    Next
+
     Set OrderBy = New ColEx
-    Call OrderBy.Initialize(QuickSort(items_, 1, items_.Count, True, property_name))
+    Call OrderBy.Initialize(sort_col)
 End Function
 
-Public Function OrderByDescending(property_name As String) As ColEx
+Public Function OrderByDescending(Optional property_name As String) As ColEx
+    Dim col As New Collection, p As New Collection, c, sort_col As New Collection
+    
+    For Each c In items_
+        Set p = New Collection
+        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByName(c, property_name, VbGet), "Value")
+        Call p.Add(c, "Item")
+        Call col.Add(p)
+    Next
+    For Each c In QuickSort(col, 1, items_.Count, False)
+        Call sort_col.Add(c.Item("Item"))
+    Next
+    
     Set OrderByDescending = New ColEx
-    Call OrderByDescending.Initialize(QuickSort(items_, 1, items_.Count, False, property_name))
+    Call OrderByDescending.Initialize(sort_col)
 End Function
 
 Public Function Distinct() As ColEx
@@ -337,6 +361,87 @@ Public Function DistinctBy(property_name As String) As ColEx
     Set DistinctBy = recol.Initialize(col)
 End Function
 
+Public Function Max(Optional property_name As String) As Variant
+    Dim v As Variant, tmp As Variant, i As Long
+    
+    If items_.Count = 0 Then Max = Null: Exit Function
+    
+    If property_name = "" Then
+        tmp = items_(1)
+        For i = 2 To items_.Count
+            If items_(i) > tmp Then tmp = items_(i)
+        Next
+    Else
+        tmp = CallByName(items_(1), property_name, VbGet)
+        For i = 2 To items_.Count
+            v = CallByName(items_(i), property_name, VbGet)
+            If v > tmp Then tmp = v
+        Next
+    End If
+    
+    Max = tmp
+End Function
+
+Public Function Min(Optional property_name As String) As Variant
+    Dim v As Variant, tmp As Variant, i As Long
+    
+    If items_.Count = 0 Then Min = Null: Exit Function
+    
+    If property_name = "" Then
+        tmp = items_(1)
+        For i = 2 To items_.Count
+            If items_(i) < tmp Then tmp = items_(i)
+        Next
+    Else
+        tmp = CallByName(items_(1), property_name, VbGet)
+        For i = 2 To items_.Count
+            v = CallByName(items_(i), property_name, VbGet)
+            If v < tmp Then tmp = v
+        Next
+    End If
+    
+    Min = tmp
+End Function
+
+Public Function MaxBy(property_name As String) As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
+    
+    If items_.Count = 0 Then Set MaxBy = Nothing: Exit Function
+    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MaxBy()", "Elements should be object.")
+    
+    temp_value = CallByName(items_(1), property_name, VbGet)
+    Set temp_item = items_(1)
+    
+    For i = 2 To items_.Count
+        v = CallByName(items_(i), property_name, VbGet)
+        If v > temp_value Then
+            temp_value = v
+            Set temp_item = items_(i)
+        End If
+    Next
+    
+    Set MaxBy = temp_item
+End Function
+
+Public Function MinBy(property_name As String) As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
+    
+    If items_.Count = 0 Then Set MinBy = Nothing: Exit Function
+    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MinBy()", "Elements should be object.")
+        
+    temp_value = CallByName(items_(1), property_name, VbGet)
+    Set temp_item = items_(1)
+    
+    For i = 2 To items_.Count
+        v = CallByName(items_(i), property_name, VbGet)
+        If v < temp_value Then
+            temp_value = v
+            Set temp_item = items_(i)
+        End If
+    Next
+    
+    Set MinBy = temp_item
+End Function
 
 Public Function ToArray()
     Dim arr, i As Long
@@ -413,48 +518,42 @@ Private Function Compare2(c As Variant, property_name As String, compare_operato
     End If
 End Function
 
-Private Function QuickSort(ByRef col As Collection, _
-                           ByVal low_boundary As Long, _
-                           ByVal up_boundary As Long, _
-                           is_asc As Boolean, _
-                           property_name As String _
-                           ) As Collection
-    Dim i As Long, j As Long, pivot As Variant, temp As Variant
-    Dim property_col As Collection, sorting_col As Collection
+Private Function QuickSort(ByRef any_pairs As Collection, ByVal low_boundary As Long, ByVal up_boundary As Long, is_asc As Boolean) As Collection
+    Dim i As Long, j As Long, pivot As Variant, temp, property_any_pairs As New Collection
+        
+    If any_pairs.Count <= 1 Then Set QuickSort = any_pairs: Exit Function
     
-    Set property_col = ColEx(col).SelectBy(property_name).Items
-    Set sorting_col = ColEx(col).Items
     i = low_boundary
     j = up_boundary
-    pivot = property_col(Round((low_boundary + up_boundary) \ 2, 0))
+    pivot = any_pairs((low_boundary + up_boundary) \ 2).Item("Value")
     
     Do While i <= j
         If is_asc Then
-            Do While property_col(i) < pivot: i = i + 1: If i > up_boundary Then Exit Do:
+            Do While any_pairs(i).Item("Value") < pivot: i = i + 1: If i > up_boundary Then Exit Do:
             Loop
-            Do While property_col(j) > pivot: j = j - 1: If j < low_boundary Then Exit Do:
+            Do While any_pairs(j).Item("Value") > pivot: j = j - 1: If j < low_boundary Then Exit Do:
             Loop
         Else
-            Do While property_col(i) > pivot: i = i + 1: If i > up_boundary Then Exit Do:
+            Do While any_pairs(i).Item("Value") > pivot: i = i + 1: If i > up_boundary Then Exit Do:
             Loop
-            Do While property_col(j) < pivot: j = j - 1: If j < low_boundary Then Exit Do:
+            Do While any_pairs(j).Item("Value") < pivot: j = j - 1: If j < low_boundary Then Exit Do:
             Loop
         End If
         If i <= j Then
-            If IsObject(col(i)) Then Set temp = col(i) Else temp = col(i)
-            Call sorting_col.Add(sorting_col(j), Before:=i)
-            Call sorting_col.Remove(i + 1)
-            Call sorting_col.Add(temp, Before:=j)
-            Call sorting_col.Remove(j + 1)
+            Set temp = any_pairs(i)
+            Call any_pairs.Add(any_pairs(j), Before:=i)
+            Call any_pairs.Remove(i + 1)
+            Call any_pairs.Add(temp, Before:=j)
+            Call any_pairs.Remove(j + 1)
             i = i + 1
             j = j - 1
         End If
     Loop
+
+    If low_boundary < j Then Call QuickSort(any_pairs, low_boundary, j, is_asc)
+    If i < up_boundary Then Call QuickSort(any_pairs, i, up_boundary, is_asc)
     
-    If low_boundary < j Then Set sorting_col = QuickSort(sorting_col, low_boundary, j, is_asc, property_name)
-    If i < up_boundary Then Set sorting_col = QuickSort(sorting_col, i, up_boundary, is_asc, property_name)
-    
-    Set QuickSort = sorting_col
+    Set QuickSort = any_pairs
 End Function
 
 Private Function Equals(comparing_item, compared_item) As Boolean
