@@ -505,6 +505,46 @@ Sub Test_ToArray()
         
 End Sub
 
+'[Fact]
+Sub Test_MinMax_Value()
+    
+    ' Arrange
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(2)
+    Call col.Add(1)
+    Call col.Add(5)
+    Call col.Add(4)
+    Call col.Add(3)
+    
+    ' Act/Assert
+    With UnitTest.NameOf("Min/Max (Value)")
+        Call .AssertEqual(1, ColEx(col).Min())
+        Call .AssertEqual(5, ColEx(col).Max())
+    End With
+        
+End Sub
+
+'[Fact]
+Sub Test_MinMax_Object()
+    
+    ' Arrange
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(5))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(3))
+    
+    ' Act/Assert
+    With UnitTest.NameOf("Min/Max (Object)")
+        Call .AssertEqual(1, ColEx(col).Min("abc"))
+        Call .AssertEqual(5, ColEx(col).Max("abc"))
+    End With
+        
+End Sub
+
 
 Private Function GetClass1Collection()
     Dim cls As New Class1

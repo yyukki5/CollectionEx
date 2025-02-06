@@ -361,6 +361,48 @@ Public Function DistinctBy(property_name As String) As ColEx
     Set DistinctBy = recol.Initialize(col)
 End Function
 
+Public Function Max(Optional property_name As String) As Variant
+    Dim c As Variant, v As Variant, tmp As Variant
+    
+    If items_.Count = 0 Then Max = Null: Exit Function
+    
+    If property_name = "" Then
+        tmp = items_(1)
+        For Each c In items_
+            tmp = IIf(c > tmp, c, tmp)
+        Next
+    Else
+        tmp = CallByName(items_(1), property_name, VbGet)
+        For Each c In items_
+            v = CallByName(c, property_name, VbGet)
+            tmp = IIf(v > tmp, v, tmp)
+        Next
+    End If
+    
+    Max = tmp
+End Function
+
+Public Function Min(Optional property_name As String) As Variant
+    Dim c As Variant, v As Variant, tmp As Variant
+    
+    If items_.Count = 0 Then Min = Null: Exit Function
+    
+    If property_name = "" Then
+        tmp = items_(1)
+        For Each c In items_
+            tmp = IIf(c < tmp, c, tmp)
+        Next
+    Else
+        tmp = CallByName(items_(1), property_name, VbGet)
+        For Each c In items_
+            v = CallByName(c, property_name, VbGet)
+            tmp = IIf(v < tmp, v, tmp)
+        Next
+    End If
+    
+    Min = tmp
+End Function
+
 
 Public Function ToArray()
     Dim arr, i As Long
