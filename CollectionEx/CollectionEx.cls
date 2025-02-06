@@ -260,25 +260,88 @@ Public Function Average() As Variant
     Average = Sum / items_.Count
 End Function
 
-Public Function Max() As Variant
-    Dim c, tmp
+Public Function Max(Optional lambda_string As String) As Variant
+    Dim v As Variant, tmp As Variant, i As Long
+    
     If items_.Count = 0 Then Max = Null: Exit Function
-    tmp = Items(1)
-    For Each c In items_
-        tmp = IIf(c > tmp, c, tmp)
+    
+    If lambda_string = "" Then
+        tmp = items_(1)
+        For i = 2 To items_.Count
+            If items_(i) > tmp Then tmp = items_(i)
     Next
+    Else
+        tmp = Lambda(items_(1), lambda_string).Evaluate
+        For i = 2 To items_.Count
+            v = Lambda(items_(i), lambda_string).Evaluate
+            If v > tmp Then tmp = v
+        Next
+    End If
+    
     Max = tmp
 End Function
 
-Public Function Min() As Variant
-    Dim c, tmp
+Public Function Min(Optional lambda_string As String) As Variant
+    Dim v As Variant, tmp As Variant, i As Long
+    
     If items_.Count = 0 Then Min = Null: Exit Function
-    tmp = Items(1)
-    For Each c In items_
-        tmp = IIf(c < tmp, c, tmp)
+    
+    If lambda_string = "" Then
+        tmp = items_(1)
+        For i = 2 To items_.Count
+            If items_(i) < tmp Then tmp = items_(i)
+        Next
+    Else
+        tmp = Lambda(items_(1), lambda_string).Evaluate
+        For i = 2 To items_.Count
+            v = Lambda(items_(i), lambda_string).Evaluate
+            If v < tmp Then tmp = v
     Next
+    End If
+    
     Min = tmp
 End Function
+
+Public Function MaxBy(lambda_string As String) As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
+    
+    If items_.Count = 0 Then Set MaxBy = Nothing: Exit Function
+    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "CollectionEx.MaxBy()", "Elements should be object.")
+        
+    temp_value = Lambda(items_(1), lambda_string).Evaluate
+    Set temp_item = items_(1)
+    
+    For i = 2 To items_.Count
+        v = Lambda(items_(i), lambda_string).Evaluate
+        If v > temp_value Then
+            temp_value = v
+            Set temp_item = items_(i)
+        End If
+    Next
+    
+    Set MaxBy = temp_item
+End Function
+
+Public Function MinBy(lambda_string As String) As Variant
+    Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
+    
+    If items_.Count = 0 Then Set MinBy = Nothing: Exit Function
+    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "CollectionEx.MinBy()", "Elements should be object.")
+        
+    temp_value = Lambda(items_(1), lambda_string).Evaluate
+    Set temp_item = items_(1)
+    
+    For i = 2 To items_.Count
+        v = Lambda(items_(i), lambda_string).Evaluate
+        If v < temp_value Then
+            temp_value = v
+            Set temp_item = items_(i)
+        End If
+    Next
+    
+    Set MinBy = temp_item
+End Function
+
 
 Public Function Orderby(lambda_string As String) As CollectionEx
     Dim col As New Collection, p As New Collection, c, recol As New CollectionEx, sort_col As New Collection
