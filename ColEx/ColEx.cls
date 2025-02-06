@@ -11,7 +11,7 @@ Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.6.0 (developing)
+' Version: 0.5.0 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
