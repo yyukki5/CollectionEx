@@ -367,7 +367,7 @@ Private Function QuickSort(ByRef any_pairs As Collection, ByVal low_boundary As 
     
     i = low_boundary
     j = up_boundary
-    pivot = any_pairs(Round((low_boundary + up_boundary) \ 2, 0) + 1).Item("Value")
+    pivot = any_pairs((low_boundary + up_boundary) \ 2).Item("Value")
     
     Do While i <= j
         If is_asc Then
@@ -382,8 +382,7 @@ Private Function QuickSort(ByRef any_pairs As Collection, ByVal low_boundary As 
             Loop
         End If
         If i <= j Then
-
-            If IsObject(any_pairs(i)) Then Set temp = any_pairs(i) Else temp = any_pairs(i)
+            Set temp = any_pairs(i)
             Call any_pairs.Add(any_pairs(j), Before:=i)
             Call any_pairs.Remove(i + 1)
             Call any_pairs.Add(temp, Before:=j)
