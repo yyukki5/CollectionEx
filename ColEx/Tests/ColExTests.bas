@@ -52,24 +52,11 @@ Sub Test_SpeedTest()
     Dim i As Long, n
     Dim cls As New Class1
     n = Timer
-    For i = 1 To 10000
-        Call ColEx(col_).Where("abc", cexEqual, 2)
-    Next i
+'    Call ColEx(GetClass1CollectionN(10000)).OrderBy("abc")
+    Call ColEx(GetClass1CollectionN(100000)).Where("abc", cexEqual, 2)
     Debug.Print "Done. " & Format((Timer - n), "0.00") & "[s]"
 End Sub
 
-
-Sub aaaa()
-
-    Dim cex As ColEx
-    Set cex = ColEx(Array(1, 2, 3, 4, 5))
-    
-    Dim aa As Variant
-    For Each aa In cex
-        Debug.Print aa
-    Next
-    
-End Sub
 
 '[Fact]
 Sub Test_Initialize_Create_Enum()
@@ -532,6 +519,16 @@ Private Function GetClass1Collection()
     Call col.Add(cls.Create(3))
 
     Set GetClass1Collection = col
+End Function
+
+Private Function GetClass1CollectionN(Optional n As Long = 10)
+    Dim cls As New Class1, i As Long
+    Dim col As New Collection
+    
+    For i = 1 To n
+        Call col.Add(cls.Create(i))
+    Next i
+    Set GetClass1CollectionN = col
 End Function
 
 Private Function GetIntCollection()

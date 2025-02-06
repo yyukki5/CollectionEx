@@ -295,13 +295,37 @@ End Function
 
 
 Public Function OrderBy(Optional property_name As String) As ColEx
+    Dim col As New Collection, p As New Collection, c, sort_col As New Collection
+    
+    For Each c In items_
+        Set p = New Collection
+        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByName(c, property_name, VbGet), "Value")
+        Call p.Add(c, "Item")
+        Call col.Add(p)
+    Next
+    For Each c In QuickSort(col, 1, items_.Count, True)
+        Call sort_col.Add(c.Item("Item"))
+    Next
+
     Set OrderBy = New ColEx
-    Call OrderBy.Initialize(QuickSort(items_, 1, items_.Count, True, property_name))
+    Call OrderBy.Initialize(sort_col)
 End Function
 
 Public Function OrderByDescending(Optional property_name As String) As ColEx
+    Dim col As New Collection, p As New Collection, c, sort_col As New Collection
+    
+    For Each c In items_
+        Set p = New Collection
+        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByName(c, property_name, VbGet), "Value")
+        Call p.Add(c, "Item")
+        Call col.Add(p)
+    Next
+    For Each c In QuickSort(col, 1, items_.Count, False)
+        Call sort_col.Add(c.Item("Item"))
+    Next
+    
     Set OrderByDescending = New ColEx
-    Call OrderByDescending.Initialize(QuickSort(items_, 1, items_.Count, False, property_name))
+    Call OrderByDescending.Initialize(sort_col)
 End Function
 
 Public Function Distinct() As ColEx
@@ -413,49 +437,42 @@ Private Function Compare2(c As Variant, property_name As String, compare_operato
     End If
 End Function
 
-Private Function QuickSort(ByRef col As Collection, _
-                           ByVal low_boundary As Long, _
-                           ByVal up_boundary As Long, _
-                           is_asc As Boolean, _
-                           property_name As String _
-                           ) As Collection
-    Dim i As Long, j As Long, pivot As Variant, temp As Variant
-    Dim property_col As Collection, sorting_col As Collection
+Private Function QuickSort(ByRef any_pairs As Collection, ByVal low_boundary As Long, ByVal up_boundary As Long, is_asc As Boolean) As Collection
+    Dim i As Long, j As Long, pivot As Variant, temp, property_any_pairs As New Collection
+        
+    If any_pairs.Count <= 1 Then Set QuickSort = any_pairs: Exit Function
     
-    If col.Count <= 1 Then Set QuickSort = col: Exit Function
-    If property_name = "" Then Set property_col = col Else Set property_col = ColEx(col).SelectBy(property_name).Items
-    Set sorting_col = ColEx(col).Items
     i = low_boundary
     j = up_boundary
-    pivot = property_col(Round((low_boundary + up_boundary) \ 2, 0) + 1)
+    pivot = any_pairs((low_boundary + up_boundary) \ 2).Item("Value")
     
     Do While i <= j
         If is_asc Then
-            Do While property_col(i) < pivot: i = i + 1: If i > up_boundary Then Exit Do:
+            Do While any_pairs(i).Item("Value") < pivot: i = i + 1: If i > up_boundary Then Exit Do:
             Loop
-            Do While property_col(j) > pivot: j = j - 1: If j < low_boundary Then Exit Do:
+            Do While any_pairs(j).Item("Value") > pivot: j = j - 1: If j < low_boundary Then Exit Do:
             Loop
         Else
-            Do While property_col(i) > pivot: i = i + 1: If i > up_boundary Then Exit Do:
+            Do While any_pairs(i).Item("Value") > pivot: i = i + 1: If i > up_boundary Then Exit Do:
             Loop
-            Do While property_col(j) < pivot: j = j - 1: If j < low_boundary Then Exit Do:
+            Do While any_pairs(j).Item("Value") < pivot: j = j - 1: If j < low_boundary Then Exit Do:
             Loop
         End If
         If i <= j Then
-            If IsObject(col(i)) Then Set temp = col(i) Else temp = col(i)
-            Call sorting_col.Add(sorting_col(j), Before:=i)
-            Call sorting_col.Remove(i + 1)
-            Call sorting_col.Add(temp, Before:=j)
-            Call sorting_col.Remove(j + 1)
+            Set temp = any_pairs(i)
+            Call any_pairs.Add(any_pairs(j), Before:=i)
+            Call any_pairs.Remove(i + 1)
+            Call any_pairs.Add(temp, Before:=j)
+            Call any_pairs.Remove(j + 1)
             i = i + 1
             j = j - 1
         End If
     Loop
+
+    If low_boundary < j Then Call QuickSort(any_pairs, low_boundary, j, is_asc)
+    If i < up_boundary Then Call QuickSort(any_pairs, i, up_boundary, is_asc)
     
-    If low_boundary < j Then Set sorting_col = QuickSort(sorting_col, low_boundary, j, is_asc, property_name)
-    If i < up_boundary Then Set sorting_col = QuickSort(sorting_col, i, up_boundary, is_asc, property_name)
-    
-    Set QuickSort = sorting_col
+    Set QuickSort = any_pairs
 End Function
 
 Private Function Equals(comparing_item, compared_item) As Boolean
