@@ -13,14 +13,14 @@ Option Explicit
 Private abc_
 Private def_ As Class2
 
-Property Get abc()
-    abc = abc_
+Property Get Abc()
+    Abc = abc_
 End Property
-Property Let abc(v)
+Property Let Abc(v)
     abc_ = v
 End Property
-Property Get def()
-    Set def = def_
+Property Get Def() As Class2
+    Set Def = def_
 End Property
 Property Get Defs()
     Dim col As New Collection
@@ -40,7 +40,7 @@ Function Init(a) As Class1
 End Function
 
 Function Equals(cls1 As Class1) As Boolean
-    Equals = Me.abc = cls1.abc
+    Equals = Me.Abc = cls1.Abc
 End Function
 
 Function DebugPrint()
