@@ -659,17 +659,17 @@ End Sub
 Sub Test_SpeedTests()
     Dim col As Collection, not_using_time As Double, using_time As Double
     ' Should be less than 100000 elements, by the avoiding the upper limit of garbage collection of "Collection".
-    Set col = GetClass1CollectionN(50000)
+    Set col = GetClass1CollectionN(90000)
     
     With UnitTest
         Call .NameOf("Where method Time")
-        not_using_time = Test_SpeedTest("Where 1", ColEx(col))
-        using_time = Test_SpeedTest("Where 1 layer", ColEx(col))
-        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 10 > using_time)
+        not_using_time = Test_SpeedTest("Not using Where 1 layer", ColEx(col))
+        using_time = Test_SpeedTest("Using Where 1 layer", ColEx(col))
+        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 15 > using_time)
         
-        not_using_time = Test_SpeedTest("Where 2", ColEx(col))
-        using_time = Test_SpeedTest("Where 2 layer", ColEx(col))
-        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 10 > using_time)
+        not_using_time = Test_SpeedTest("Not using Where 2 layer", ColEx(col))
+        using_time = Test_SpeedTest("Using Where 2 layer", ColEx(col))
+        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 20 > using_time)
 
     End With
     
@@ -678,7 +678,7 @@ End Sub
 
 Private Function Test_SpeedTest(test_name As String, cex As ColEx) As Double
     Dim col As New Collection, c As Class1
-    Dim n:    n = Timer
+    Dim n:    n = (Timer)
     
     Select Case test_name
         Case "Not using Where 1 layer"
