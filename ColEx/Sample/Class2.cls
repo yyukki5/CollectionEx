@@ -12,15 +12,26 @@ Option Explicit
 
 Private def_
 
-Property Get def()
-    def = def_
-End Property
 
 Function Init(a) As Class2
     def_ = a
     Set Init = Me
 End Function
 
-Function Equals(cls2 As Class2) As Boolean
-    Equals = Me.def = cls2.def
+
+Property Get Def()
+    Def = def_
+End Property
+
+Public Property Get MySelf() As Class2
+    Set MySelf = Me
+End Property
+
+
+Public Function Equals(cls2 As Class2) As Boolean
+    Equals = Me.Def = cls2.Def
+End Function
+
+Public Function ToString() As String
+    ToString = Format(def_)
 End Function

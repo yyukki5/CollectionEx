@@ -11,7 +11,7 @@ Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.5.0 (developing)
+' Version: 0.6.0 (developing)
 ' Specification may be changed.
 ' -------------------------------------------
 
@@ -29,6 +29,7 @@ Public Enum cexOperators
 End Enum
 
 
+
 Private Sub Class_Initialize()
     Set items_ = New Collection
 End Sub
@@ -38,6 +39,7 @@ Public Function Initialize(col As Collection) As ColEx
     Set Initialize = Me
 End Function
 
+' todo case of empty
 Public Function Create(enum_variant) As ColEx
 Attribute Create.VB_UserMemId = 0
     Dim col As Collection, c As Variant
@@ -52,10 +54,12 @@ Attribute Create.VB_UserMemId = 0
 End Function
 
 
+
 Public Property Get NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = items_.[_NewEnum]
 End Property
+
 Public Property Get Items() As Collection
     Set Items = items_
 End Property
@@ -70,6 +74,7 @@ Public Function Add(class_item As Variant) As ColEx
     Call items_.Add(class_item)
     Set Add = Me
 End Function
+
 Public Function AddRange(col As Collection) As ColEx
     Dim c
     For Each c In col
@@ -77,6 +82,7 @@ Public Function AddRange(col As Collection) As ColEx
     Next
     Set AddRange = Me
 End Function
+
 Public Function Remove(item_index As Long) As ColEx
     Call items_.Remove(item_index)
     Set Remove = Me
@@ -103,9 +109,9 @@ Public Function SelectBy(property_name As String, Optional call_type As VbCallTy
     
     For Each c In items_
         If IsMissing(any_parameters) Then
-            Call col.Add(CallByName(c, property_name, call_type))
+            Call col.Add(CallByNames(c, property_name, call_type))
         Else
-            Call col.Add(CallByName(c, property_name, call_type, any_parameters))
+            Call col.Add(CallByNames(c, property_name, call_type, any_parameters))
         End If
     Next
     
@@ -117,7 +123,7 @@ Public Function SelectManyBy(property_name As String) As ColEx
     Set col = New Collection
     
     For Each c In items_
-        For Each c1 In CallByName(c, property_name, VbGet)
+        For Each c1 In CallByNames(c, property_name, VbGet)
             Call col.Add(c1)
         Next
     Next
@@ -299,7 +305,7 @@ Public Function OrderBy(Optional property_name As String) As ColEx
     
     For Each c In items_
         Set p = New Collection
-        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByName(c, property_name, VbGet), "Value")
+        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByNames(c, property_name, VbGet), "Value")
         Call p.Add(c, "Item")
         Call col.Add(p)
     Next
@@ -316,7 +322,7 @@ Public Function OrderByDescending(Optional property_name As String) As ColEx
     
     For Each c In items_
         Set p = New Collection
-        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByName(c, property_name, VbGet), "Value")
+        If property_name = "" Then Call p.Add(c, "Value") Else Call p.Add(CallByNames(c, property_name, VbGet), "Value")
         Call p.Add(c, "Item")
         Call col.Add(p)
     Next
@@ -350,16 +356,17 @@ Public Function DistinctBy(property_name As String) As ColEx
     For Each c In items_
         f = False
         For Each compare_item In compare_items
-            If Equals(compare_item, CallByName(c, property_name, VbGet)) Then f = True: Exit For
+            If Equals(compare_item, CallByNames(c, property_name, VbGet)) Then f = True: Exit For
         Next
         If f = False Then
             Call col.Add(c)
-            Call compare_items.Add(CallByName(c, property_name, VbGet))
+            Call compare_items.Add(CallByNames(c, property_name, VbGet))
         End If
     Next
     
     Set DistinctBy = recol.Initialize(col)
 End Function
+
 
 Public Function Max(Optional property_name As String) As Variant
     Dim v As Variant, tmp As Variant, i As Long
@@ -372,9 +379,9 @@ Public Function Max(Optional property_name As String) As Variant
             If items_(i) > tmp Then tmp = items_(i)
         Next
     Else
-        tmp = CallByName(items_(1), property_name, VbGet)
+        tmp = CallByNames(items_(1), property_name, VbGet)
         For i = 2 To items_.Count
-            v = CallByName(items_(i), property_name, VbGet)
+            v = CallByNames(items_(i), property_name, VbGet)
             If v > tmp Then tmp = v
         Next
     End If
@@ -393,9 +400,9 @@ Public Function Min(Optional property_name As String) As Variant
             If items_(i) < tmp Then tmp = items_(i)
         Next
     Else
-        tmp = CallByName(items_(1), property_name, VbGet)
+        tmp = CallByNames(items_(1), property_name, VbGet)
         For i = 2 To items_.Count
-            v = CallByName(items_(i), property_name, VbGet)
+            v = CallByNames(items_(i), property_name, VbGet)
             If v < tmp Then tmp = v
         Next
     End If
@@ -409,11 +416,11 @@ Public Function MaxBy(property_name As String) As Variant
     If items_.Count = 0 Then Set MaxBy = Nothing: Exit Function
     If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MaxBy()", "Elements should be object.")
     
-    temp_value = CallByName(items_(1), property_name, VbGet)
+    temp_value = CallByNames(items_(1), property_name, VbGet)
     Set temp_item = items_(1)
     
     For i = 2 To items_.Count
-        v = CallByName(items_(i), property_name, VbGet)
+        v = CallByNames(items_(i), property_name, VbGet)
         If v > temp_value Then
             temp_value = v
             Set temp_item = items_(i)
@@ -429,11 +436,11 @@ Public Function MinBy(property_name As String) As Variant
     If items_.Count = 0 Then Set MinBy = Nothing: Exit Function
     If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MinBy()", "Elements should be object.")
         
-    temp_value = CallByName(items_(1), property_name, VbGet)
+    temp_value = CallByNames(items_(1), property_name, VbGet)
     Set temp_item = items_(1)
     
     For i = 2 To items_.Count
-        v = CallByName(items_(i), property_name, VbGet)
+        v = CallByNames(items_(i), property_name, VbGet)
         If v < temp_value Then
             temp_value = v
             Set temp_item = items_(i)
@@ -442,6 +449,7 @@ Public Function MinBy(property_name As String) As Variant
     
     Set MinBy = temp_item
 End Function
+
 
 Public Function ToArray()
     Dim arr, i As Long
@@ -474,7 +482,7 @@ Public Function ToArray2D(ParamArray property_names())
     For i = LBound(arr, 1) To UBound(arr, 1)
         j = 0
         For Each p In ps
-            Call SetObjectAsBuffer(CallByName(items_.Item(i + 1), p, VbGet), arr(i, j))
+            Call SetObjectAsBuffer(CallByNames(items_.Item(i + 1), p, VbGet), arr(i, j))
             j = j + 1
         Next
     Next i
@@ -484,6 +492,37 @@ End Function
 
 
 ' private functions --------------------------------
+Private Function CallByNames(obj As Variant, _
+                             ByVal prop_names_string As String, _
+                             ByVal call_type As VbCallType, _
+                             Optional args As Variant _
+                             ) As Variant
+    Dim prop_names As Variant, val As Variant, i As Long
+    
+    If InStr(prop_names_string, ".") = 0 Then
+        If IsMissing(args) Then
+            Call SetObjectAsBuffer(CallByName(obj, prop_names_string, call_type), CallByNames)
+        Else
+            Call SetObjectAsBuffer(CallByName(obj, prop_names_string, call_type, args), CallByNames)
+        End If
+        
+    Else
+        Set val = obj
+        prop_names = Split(prop_names_string, ".")
+        
+        For i = LBound(prop_names) To UBound(prop_names)
+            If i = UBound(prop_names) Then
+                Call SetObjectAsBuffer(CallByName(val, prop_names(i), call_type), val)
+            Else
+                Call SetObjectAsBuffer(CallByName(val, prop_names(i), VbGet), val)
+            End If
+        Next
+        Call SetObjectAsBuffer(val, CallByNames)
+    
+    End If
+
+End Function
+
 Private Function Compare(compared_value As Variant, compare_operator As cexOperators, Optional compare_value As Variant = Null)
     If IsNull(compare_value) Then
     
@@ -514,7 +553,7 @@ Private Function Compare2(c As Variant, property_name As String, compare_operato
     If property_name = "" Then
         If Compare(c, compare_operator, compare_value) Then Compare2 = True
     Else
-        If Compare(CallByName(c, property_name, VbGet), compare_operator, compare_value) Then Compare2 = True
+        If Compare(CallByNames(c, property_name, VbGet), compare_operator, compare_value) Then Compare2 = True
     End If
 End Function
 
