@@ -454,6 +454,8 @@ End Function
 
 Public Function ToArray()
     Dim arr, i As Long
+    
+    If items_.Count = 0 Then Exit Function
     ReDim arr(0 To items_.Count - 1)
     
     For i = LBound(arr) To UBound(arr)
@@ -465,6 +467,8 @@ End Function
 
 Public Function ToArray2D(ParamArray property_names())
     Dim arr, i As Long, j As Long, cnt As Long, p As Variant, ps As Variant, l As Long, u As Long
+    
+    If items_.Count = 0 Then Exit Function
     
     ps = property_names
     cnt = UBound(property_names) - LBound(property_names)
