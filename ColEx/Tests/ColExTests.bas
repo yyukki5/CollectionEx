@@ -10,7 +10,6 @@ End Sub
 Sub RunTests()
    Dim test As New UnitTest
 
-    test.RegisterTest "Test_SpeedTests"
     test.RegisterTest "Test_Initialize_Create_Enum"
     test.RegisterTest "Test_Add"
     test.RegisterTest "Test_Where"
@@ -28,52 +27,12 @@ Sub RunTests()
     test.RegisterTest "Test_MinMax_Value"
     test.RegisterTest "Test_MinMax_Object"
     test.RegisterTest "Test_MinByMaxBy_Object"
+    test.RegisterTest "Test_SpeedTests"
 
     test.RunTests UnitTest
 End Sub
 
-'[Fact]
-Sub Test_SpeedTests()
-    Dim col As Collection, not_using_time As Double, using_time As Double
-    ' Should be less than 100000 elements, by the avoiding the upper limit of garbage collection of "Collection".
-    Set col = GetClass1CollectionN(50000)
-    
-    With UnitTest
-        Call .NameOf("Where method Time")
-        not_using_time = Test_SpeedTest("Where 1", ColEx(col))
-        using_time = Test_SpeedTest("Where 1 layer", ColEx(col))
-        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 10 > using_time)
-        
-        not_using_time = Test_SpeedTest("Where 2", ColEx(col))
-        using_time = Test_SpeedTest("Where 2 layer", ColEx(col))
-        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 10 > using_time)
 
-    End With
-    
-    Set col = Nothing
-End Sub
-
-Private Function Test_SpeedTest(test_name As String, cex As ColEx) As Double
-    Dim col As New Collection, c As Class1
-    Dim n:    n = Timer
-    
-    Select Case test_name
-        Case "Not using Where 1 layer"
-            For Each c In cex
-                If c.Abc = 2 Then Call col.Add(c)
-            Next
-        Case "Not using Where 2 layer"
-            For Each c In cex
-                If c.Def.Def = 2 Then Call col.Add(c)
-            Next
-        Case "Using Where 1 layer":       Call cex.Where("Abc", cexEqual, 2)
-        Case "Using Where 2 layer":       Call cex.Where("Def.Def", cexEqual, 2)
-    End Select
-    
-    
-    Test_SpeedTest = (Timer - n)
-'    Debug.Print test_name & ":" & Format(Test_SpeedTest, "0.0000") & "[s]"
-End Function
 
 '[Fact]
 Sub Test_Initialize_Create_Enum()
@@ -88,7 +47,8 @@ Sub Test_Initialize_Create_Enum()
     Call col.Add(cls.Create(4))
     Call col.Add(cls.Create(5))
     
-    With UnitTest.NameOf("Initialize and Create and Enum")
+    With UnitTest
+        Call .NameOf("Initialize and Create and Enum")
         Call .AssertEqual("ColEx", TypeName(ColEx(col)))
         Call .AssertEqual(col.Count, ColEx(col).Count)
         
@@ -104,10 +64,22 @@ Sub Test_Initialize_Create_Enum()
         Next
         Call .AssertHasNoError
         Call .AssertEqual(15, added)
-    End With
         
-    With UnitTest.NameOf("collection instance is not same (copied)")
+        Call .NameOf("collection instance is not same (copied)")
         Call .AssertNotSame(ColEx(col).Items, col)
+        
+        
+        Call .NameOf("Empty/Null, should return empty collection")
+        Call .AssertEqual(0, ColEx(Empty).Count)
+        Call .AssertEqual(0, ColEx(Null).Count)
+        
+        Call .NameOf("Nothing, Should raise error")
+        On Error Resume Next
+        Call .AssertEqual(0, ColEx(Nothing).Count)
+        Call .AssertHasError
+        Err.Clear
+        On Error GoTo 0
+        
     End With
 End Sub
 
@@ -237,7 +209,7 @@ End Sub
 Sub Test_FirstLast()
     Dim col As Collection:  Set col = GetClass1Collection()
     Dim cls As New Class1
-    Dim emptyCollection As New Collection
+    Dim empty_collection As New Collection
         
     With UnitTest
         .NameOf ("First/FirstOrDefault")
@@ -256,12 +228,12 @@ Sub Test_FirstLast()
         Call .AssertHasError
         Call Err.Clear
         
-        Call ColEx(emptyCollection).First
+        Call ColEx(empty_collection).First
         Call .AssertHasError
         Call Err.Clear
         On Error GoTo 0
         
-        Call .AssertNothing(ColEx(emptyCollection).FirstOrDefault(, , , Nothing))
+        Call .AssertNothing(ColEx(empty_collection).FirstOrDefault(, , , Nothing))
         
         
         .NameOf ("Last/LastOrDefault")
@@ -279,12 +251,12 @@ Sub Test_FirstLast()
         Call .AssertHasError
         Call Err.Clear
         
-        Call ColEx(emptyCollection).Last
+        Call ColEx(empty_collection).Last
         Call .AssertHasError
         Call Err.Clear
         On Error GoTo 0
                 
-        Call .AssertNothing(ColEx(emptyCollection).LastOrDefault(, , , Nothing))
+        Call .AssertNothing(ColEx(empty_collection).LastOrDefault(, , , Nothing))
         
         
         .NameOf ("Single/SingleOrDefault")
@@ -314,16 +286,16 @@ Sub Test_FirstLast()
         Call .AssertHasError
         Call Err.Clear
         
-        Call ColEx(emptyCollection).SingleBy
+        Call ColEx(empty_collection).SingleBy
         Call .AssertHasError
         Call Err.Clear
         
-        Call .AssertNothing(ColEx(emptyCollection).SingleOrDefaultBy(, , , Nothing))
+        Call .AssertNothing(ColEx(empty_collection).SingleOrDefaultBy(, , , Nothing))
                     
-        Set emptyCollection = New Collection
-        Call emptyCollection.Add(cls.Create(1))
-        Call .AssertEqual(cls.Create(1), ColEx(emptyCollection).SingleBy)
-        Call .AssertEqual(cls.Create(1), ColEx(emptyCollection).SingleOrDefaultBy)
+        Set empty_collection = New Collection
+        Call empty_collection.Add(cls.Create(1))
+        Call .AssertEqual(cls.Create(1), ColEx(empty_collection).SingleBy)
+        Call .AssertEqual(cls.Create(1), ColEx(empty_collection).SingleOrDefaultBy)
 
     End With
 End Sub
@@ -561,6 +533,10 @@ Sub Test_ToArray()
         Call .AssertTrue(IsArray(res))
         Call .AssertEqual(4, UBound(res))
         Call .AssertEqual(0, LBound(res))
+                
+        Call .NameOf("ToArray, case of empty collection, return empty")
+        res = ColEx(Empty).ToArray()
+        Call .AssertTrue(IsEmpty(res))
 
         Call .NameOf("ToArray2D, param array")
         res = ColEx(col).ToArray2D("Abc", "Def")
@@ -596,6 +572,10 @@ Sub Test_ToArray()
         Call .AssertEqual(0, LBound(res, 2))
         Call .AssertEqual(1, res(0, 0))
         Call .AssertEqual(5, res(4, 0))
+
+        Call .NameOf("ToArray2D, case of empty collection, return empty")
+        res = ColEx(Empty).ToArray2D(arr_names)
+        Call .AssertTrue(IsEmpty(res))
 
     End With
         
@@ -675,6 +655,48 @@ Sub Test_MinByMaxBy_Object()
         
 End Sub
 
+'[Fact]
+Sub Test_SpeedTests()
+    Dim col As Collection, not_using_time As Double, using_time As Double
+    ' Should be less than 100000 elements, by the avoiding the upper limit of garbage collection of "Collection".
+    Set col = GetClass1CollectionN(90000)
+    
+    With UnitTest
+        Call .NameOf("Where method Time")
+        not_using_time = Test_SpeedTest("Not using Where 1 layer", ColEx(col))
+        using_time = Test_SpeedTest("Using Where 1 layer", ColEx(col))
+        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 15 > using_time)
+        
+        not_using_time = Test_SpeedTest("Not using Where 2 layer", ColEx(col))
+        using_time = Test_SpeedTest("Using Where 2 layer", ColEx(col))
+        Call .AssertTrue(using_time < 0.0001 Or not_using_time * 20 > using_time)
+
+    End With
+    
+    Set col = Nothing
+End Sub
+
+Private Function Test_SpeedTest(test_name As String, cex As ColEx) As Double
+    Dim col As New Collection, c As Class1
+    Dim n:    n = (Timer)
+    
+    Select Case test_name
+        Case "Not using Where 1 layer"
+            For Each c In cex
+                If c.Abc = 2 Then Call col.Add(c)
+            Next
+        Case "Not using Where 2 layer"
+            For Each c In cex
+                If c.Def.Def = 2 Then Call col.Add(c)
+            Next
+        Case "Using Where 1 layer":       Call cex.Where("Abc", cexEqual, 2)
+        Case "Using Where 2 layer":       Call cex.Where("Def.Def", cexEqual, 2)
+    End Select
+    
+    
+    Test_SpeedTest = (Timer - n)
+'    Debug.Print test_name & ":" & Format(Test_SpeedTest, "0.0000") & "[s]"
+End Function
 
 
 Private Function GetClass1Collection()
