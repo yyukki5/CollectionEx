@@ -14,7 +14,7 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.11.0 (developing)
+' Version: 0.12.0 (developing)
 ' Depend on: Lambda.cls
 ' Specification may be changed.
 ' -------------------------------------------
@@ -28,14 +28,16 @@ End Function
 Public Function Create(enum_variant) As CollectionEx
 Attribute Create.VB_Description = "Return new instance of CollectionEx"
 Attribute Create.VB_UserMemId = 0
-    Dim col As Collection, c
-
+    Dim cex As CollectionEx, col As Collection, c
     Set col = New Collection
+    Set cex = New CollectionEx
+
+    If IsEmpty(enum_variant) Or IsNull(enum_variant) Then Set Create = cex.Initialize(col): Exit Function
+
     For Each c In enum_variant
         Call col.Add(c)
     Next
 
-    Dim cex As New CollectionEx
     Set Create = cex.Initialize(col)
 End Function
 

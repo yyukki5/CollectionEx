@@ -51,10 +51,10 @@ Simplified and Faster CollectionEx
 ~~~vb
     Dim res
     res = ColEx(col) _
-        .Where("abc", cexLessThan, 7) _
-        .OrderByDescending("abc") _
+        .Where("Abc", cexLessThan, 7) _
+        .OrderByDescending("Abc") _
         .Take(3) _
-        .SelectBy("abc") _
+        .SelectBy("Def.Def") _
         .ToArray
     
     Dim v as Class1
@@ -68,7 +68,8 @@ Simplified and Faster CollectionEx
 ## Features
 1. Predeclared
 1. Quick initialized (used default function "Create()")
-1. can use "For Each"
+1. Can reference property of class by using property names. 
+1. Can use "For Each"
 1. Any LINQ functions
     - Where()
     - SelectBy(), SelectManyBy()
@@ -87,9 +88,9 @@ Simplified and Faster CollectionEx
 ## Japanese Note
 CollectionEx を簡略化、軽量化したもの。（Lambda を使っていない）  
 
-- 要素の直下のプロパティを使ってWhereしたり、Selectしたり出来る  
-- 2階層以降のプロパティにはアクセスできないので For Each を使う  
-- SelectBy() を除き、メソッドを使う場合は、ForEachを利用するか、CollectionExを使う 
+- 要素のプロパティを使ってWhereしたり、Selectしたり出来る  
+- SelectBy() を除き、メソッドを使う場合はForEach を利用するかCollectionEx を使う 
+- SelectBy() はメソッドを指定できます。（指定した最下層のクラスのみ有効）
 - デフォルトメソッドはCreate()
 
 <br>

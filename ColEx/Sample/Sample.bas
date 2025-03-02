@@ -13,10 +13,10 @@ Sub SampleCode()
         
     Dim res
     res = ColEx(col) _
-        .Where("abc", cexLessThan, 7) _
-        .OrderByDescending("abc") _
+        .Where("Abc", cexLessThan, 7) _
+        .OrderByDescending("Abc") _
         .Take(3) _
-        .SelectBy("abc") _
+        .SelectBy("Def.Def") _
         .ToArray
             
     For i = LBound(res) To UBound(res)
