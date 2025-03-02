@@ -39,17 +39,18 @@ Public Function Initialize(col As Collection) As ColEx
     Set Initialize = Me
 End Function
 
-' todo case of empty
 Public Function Create(enum_variant) As ColEx
 Attribute Create.VB_UserMemId = 0
-    Dim col As Collection, c As Variant
-    
+    Dim cex As ColEx, col As Collection, c As Variant
     Set col = New Collection
+    Set cex = New ColEx
+    
+    If IsEmpty(enum_variant) Or IsNull(enum_variant) Then Set Create = cex.Initialize(col): Exit Function
+    
     For Each c In enum_variant
         Call col.Add(c)
     Next
     
-    Dim cex As New ColEx
     Set Create = cex.Initialize(col)
 End Function
 
