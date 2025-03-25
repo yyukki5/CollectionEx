@@ -1,6 +1,11 @@
 Attribute VB_Name = "ColExTests"
 '<dir .\Tests /dir>
 
+' Note --------------------------------------
+' This is unit tests of ColEx.cls
+' Depend on: UnitTest.cls
+' -------------------------------------------
+
 Option Explicit
 
 Private Sub CreateTests()

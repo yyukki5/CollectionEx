@@ -1,5 +1,11 @@
 Attribute VB_Name = "CollectionExTests"
 '<dir .\Tests /dir>
+
+' Note --------------------------------------
+' This is unit tests of CollectionEx.cls
+' Depend on: UnitTest.cls
+' -------------------------------------------
+
 Option Explicit
 
 Private colVal_ As Collection
