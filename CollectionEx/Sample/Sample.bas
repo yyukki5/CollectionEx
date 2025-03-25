@@ -18,7 +18,7 @@ Sub SampleCode()
         .Take(3) _
         .SelectBy("x => x.abc") _
         .ToArray
-            
+        
     For i = LBound(res) To UBound(res)
         Debug.Print res(i)
     Next i

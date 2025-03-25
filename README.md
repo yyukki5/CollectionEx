@@ -3,48 +3,47 @@ Expanding Collection's function.
 
 
 ## How to use
-~~~
+~~~vb
     res1 = CollectionEx(col) _
         .Where("x => x.abc < 7") _
         .OrderByDescending("x => x.abc") _
         .Take(3) _
         .SelectBy("x => x.abc") _
-        .ToArray
+        .ToArray()
     
     set res2 = CollectionEx.Initialize(col).Take(3).Items
 ~~~
 
 ## Features
- - No need to write "Dim" and "New" for use.  class is predeclared, and can initialize by class name as default function. 
- - After initialization, run some function and output as Collection or something
- - Some functions can use "lambda string" (Simply implemented anonymous function by string) 
- - If comparing objects as equal, objects should has Equals() function. if not has, raise error
- 
+- Predeclared & Quick initialized. <br> No need to write "Dim" and "New" for use.  class is predeclared, and can initialize by class name as default function. 
+- Can use "For Each"
+- Can use some LINQ likes functions
+- Can refer property or method by using "lambda string" (Simply implemented anonymous function by string. example: ```"x => x.abc"``` ) 
+
 <br>
- * Specification may be changed until version 1.0.0.  
+ * If comparing objects as equal, objects should has Equals() function. if not has, raise error. <br>
 
- 
+
 ## Files
- - Can import these files to your VBA project
-    - CollectionEx.cls
-    - Lambda.cls (<- see [Lambda Repository](https://github.com/yyukki5/Lambda)  (Ver.0.6.0))
+1. CollectionEx.cls
+1. Lambda.cls (<- see [Lambda Repository](https://github.com/yyukki5/Lambda) )
 
+After Importing these 2 files to your VBA project, you can use it.
 
 
 
 ## Japanese Note
-Collection を使う時に少しラクするためのクラス  
-Collection をよく使うので、少し楽したいなと思ったので自作  
-LINQライクに出来るといいかなと思ったが、まだ計算できないときがあるかも...  
-→ Lambda.clsは別Repositoryで作ることにしました
+- Collection を使う時に少しラクするためのクラス  
+- 宣言済み かつ デフォルトメソッドが Create()なので、短い記述で使えます
+- Collection と同じように For Each でループを回すことも出来ます
+- ラムダ文字列を用いて、LINQのようなメソッドが使えます
+- CollectionEx と Lambda のファイルを２つインポートするだけで使えます 
 
 
-  
-作成中
-
+<br>
 
 # ColEx
-Simplified and Faster CollectionEx
+More Simply and Faster than CollectionEx
 
 
 ## How to use
@@ -55,7 +54,7 @@ Simplified and Faster CollectionEx
         .OrderByDescending("Abc") _
         .Take(3) _
         .SelectBy("Def.Def") _
-        .ToArray
+        .ToArray()
     
     Dim v as Class1
     For Each v in ColEx(col).Take(3)
@@ -66,32 +65,35 @@ Simplified and Faster CollectionEx
 ~~~
 
 ## Features
-1. Predeclared
-1. Quick initialized (used default function "Create()")
-1. Can reference property of class by using property names. 
-1. Can use "For Each"
-1. Any LINQ functions
-    - Where()
-    - SelectBy(), SelectManyBy()
-    - AnyBy(), AllBy()
-    - Take(), Skip(), First(), FirstOrDafult(), Last(), LastOrDefault(), SingleBy(), SingleOrDefaultBy()  
-    - OrderBy(), OrderByDescending()
-    - Contains(), Distinct(), DistinctBy()
+- Predeclared & Quick initialized (used default function "Create()")
+- Can use "For Each"
+- Can use some LINQ likes functions
+- Can refer property or method of class by using property names. example: ```"Abc"``` 
+### LINQ likes functions
+- Where()
+- SelectBy(), SelectManyBy()
+- AnyBy(), AllBy()
+- First(), FirstOrDefault(), Last(), LastOrDefault(), SingleBy(), SingleOrDefaultBy()
+- Take(), Skip()
+- OrderBy(), OrderByDescending()
+- Contains(), Distinct(), DistinctBy()
+- Min(), MinBy(), Max(), MaxBy(), Sum() 
 
 <br>
  * If comparing objects as equal, objects should has Equals() function. if not has, raise error. <br>
- * Specification may be changed until version 1.0.0.  
 
 
+ ## Files
+1. ColEx.cls
+
+After Importing only 1 file to your VBA project, you can use it.
 
 
 ## Japanese Note
-CollectionEx を簡略化、軽量化したもの。（Lambda を使っていない）  
-
-- 要素のプロパティを使ってWhereしたり、Selectしたり出来る  
-- SelectBy() を除き、メソッドを使う場合はForEach を利用するかCollectionEx を使う 
-- SelectBy() はメソッドを指定できます。（指定した最下層のクラスのみ有効）
-- デフォルトメソッドはCreate()
-
-<br>
-作成中
+CollectionEx を 簡略化、軽量化したもの （Lambda を使っていません）
+- 宣言済み かつ デフォルトメソッドが Create()なので、短い記述で使えます
+- Collection と同じように For Each でループを回すことも出来ます
+- 要素のプロパティを使ってLINQのようなメソッド(Where, Selectなど)が使えます  
+    - SelectBy() はメソッドを指定できます。（指定した最下層のクラスのみ有効）
+    - SelectBy() を除き、メソッドを使う場合はForEach を利用するかCollectionEx を使う 
+- ColEx.cls のファイルを１つインポートするだけで使えます 

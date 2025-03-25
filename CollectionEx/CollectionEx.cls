@@ -14,10 +14,19 @@ Private items_ As Collection
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.12.0 (developing)
+' Version: 1.0.0
 ' Depend on: Lambda.cls
-' Specification may be changed.
 ' -------------------------------------------
+
+Private Enum ErrNumber
+    Unknown = 9100
+    SequenceIsEmpty
+    NoElementSatisfied
+    NotSingleElement
+    ElementsAreNotObject
+    FailedToEvaluateEquals
+    NotExpectedType
+End Enum
 
 
 Public Function Initialize(col As Collection) As CollectionEx
@@ -45,30 +54,34 @@ Public Property Get NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = items_.[_NewEnum]
 End Property
+
 Public Property Get Items() As Collection
     Set Items = items_
 End Property
 
 
 Public Function Where(lambda_string As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx
+    Dim col As New Collection, recol As New CollectionEx, c
+    
     For Each c In items_
-        If Lambda(c, lambda_string).Evaluate = True Then col.Add c
+        If Lambda(c, lambda_string).Evaluate = True Then Call col.Add(c)
     Next
+    
     Set Where = recol.Initialize(col)
 End Function
 
 Public Function SelectBy(lambda_string As String) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx
+    Dim col As New Collection, recol As New CollectionEx, c
+    
     For Each c In items_
-        col.Add Lambda(c, lambda_string).Evaluate
+        Call col.Add(Lambda(c, lambda_string).Evaluate)
     Next
+    
     Set SelectBy = recol.Initialize(col)
 End Function
 
 Public Function SelectManyBy(lambda_string As String) As CollectionEx
-    Dim c As Variant, c1 As Variant, col As Collection, recol As New CollectionEx
-    Set col = New Collection
+    Dim c As Variant, c1 As Variant, col As New Collection, recol As New CollectionEx
     
     For Each c In items_
         For Each c1 In Lambda(c, lambda_string).Evaluate
@@ -81,42 +94,44 @@ End Function
 
 
 Public Function Count(Optional lambda_string As String) As Long
-    If lambda_string = "" Then Count = items_.Count: Exit Function
     Dim col As New Collection, c
+    
+    If lambda_string = "" Then Count = items_.Count: Exit Function
     For Each c In items_
-        If Lambda(c, lambda_string).Evaluate Then col.Add c
+        If Lambda(c, lambda_string).Evaluate Then Call col.Add(c)
     Next
+    
     Count = col.Count
 End Function
 
-Public Function Add(addedItem, Optional Key As String) As CollectionEx
-    If Key = "" Then items_.Add addedItem Else items_.Add addedItem, Key
+Public Function Add(an_item, Optional a_key As String) As CollectionEx
+    If a_key = "" Then Call items_.Add(an_item) Else Call items_.Add(an_item, a_key)
     Set Add = Me
 End Function
 
-Public Function AddRange(coll As Collection) As CollectionEx
+Public Function AddRange(any_items As Collection) As CollectionEx
     Dim c
-    For Each c In coll
-        items_.Add c
+    For Each c In any_items
+        Call items_.Add(c)
     Next
     Set AddRange = Me
 End Function
 
-Public Function Remove(index) As CollectionEx
-    items_.Remove (index)
+Public Function Remove(index_or_key) As CollectionEx
+    Call items_.Remove(index_or_key)
     Set Remove = Me
 End Function
 
 Public Function First(Optional lambda_string As String)
     Dim i As Long
-    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.First()", "The sequence is empty")
+    If items_.Count = 0 Then Call Err.Raise(ErrNumber.SequenceIsEmpty, "CollectionEx.First()", "The sequence is empty")
     If lambda_string = "" Then Call SetObjectAsBuffer(items_(1), First): Exit Function
     
     For i = 1 To items_.Count
         If Lambda(items_(i), lambda_string).Evaluate Then Call SetObjectAsBuffer(items_(i), First): Exit Function
     Next i
     
-    Call Err.Raise(9001, "CollectionEx.First()", "No element satisfies the comparing condition.")
+    Call Err.Raise(ErrNumber.NoElementSatisfied, "CollectionEx.First()", "No element satisfies the comparing condition.")
 End Function
     
 Public Function FirstOrDefault(Optional lambda_string As String, Optional default_value As Variant = Null)
@@ -133,14 +148,14 @@ End Function
 
 Public Function Last(Optional lambda_string As String)
     Dim i As Long
-    If items_.Count = 0 Then Call Err.Raise(9001, "CollectionEx.Last()", "The sequence is empty")
+    If items_.Count = 0 Then Call Err.Raise(ErrNumber.SequenceIsEmpty, "CollectionEx.Last()", "The sequence is empty")
     If lambda_string = "" Then Call SetObjectAsBuffer(items_(items_.Count), Last): Exit Function
     
     For i = items_.Count To 1 Step -1
         If Lambda(items_(i), lambda_string).Evaluate Then Call SetObjectAsBuffer(items_(i), Last): Exit Function
     Next i
     
-    Call Err.Raise(9001, "CollectionEx.Last()", "No element satisfies the comparing condition.")
+    Call Err.Raise(ErrNumber.NoElementSatisfied, "CollectionEx.Last()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function LastOrDefault(Optional lambda_string As String, Optional default_value As Variant = Null)
@@ -159,22 +174,22 @@ Public Function SingleBy(Optional lambda_string As String)
     Dim i As Long, f As Boolean
     If lambda_string = "" Then
         If items_.Count = 0 Then
-            Call Err.Raise(9001, "CollectionEx.SingleBy()", "The sequence is empty")
+            Call Err.Raise(ErrNumber.SequenceIsEmpty, "CollectionEx.SingleBy()", "The sequence is empty")
         ElseIf items_.Count = 1 Then
             Call SetObjectAsBuffer(items_(1), SingleBy): Exit Function
         Else
-            Call Err.Raise(9002, "CollectionEx.SingleBy()", "The input sequence contains more than one element.")
+            Call Err.Raise(ErrNumber.NotSingleElement, "CollectionEx.SingleBy()", "The input sequence contains more than one element.")
         End If
     End If
     
     For i = 1 To items_.Count
         If Lambda(items_(i), lambda_string).Evaluate Then
-            If f = False Then f = True Else Call Err.Raise(9002, "CollectionEx.SingleBy()", "The input sequence contains more than one element.")
+            If f = False Then f = True Else Call Err.Raise(ErrNumber.NotSingleElement, "CollectionEx.SingleBy()", "The input sequence contains more than one element.")
             Call SetObjectAsBuffer(items_(i), SingleBy)
         End If
     Next i
         
-    If f = False Then Call Err.Raise(9001, "CollectionEx.SingleBy()", "No element satisfies the comparing condition.")
+    If f = False Then Call Err.Raise(ErrNumber.NoElementSatisfied, "CollectionEx.SingleBy()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function SingleOrDefaultBy(Optional lambda_string As String, Optional default_value As Variant = Null)
@@ -185,13 +200,13 @@ Public Function SingleOrDefaultBy(Optional lambda_string As String, Optional def
         ElseIf items_.Count = 1 Then
             Call SetObjectAsBuffer(items_(1), SingleOrDefaultBy): Exit Function
         Else
-            Call Err.Raise(9002, "CollectionEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+            Call Err.Raise(ErrNumber.NotSingleElement, "CollectionEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
         End If
     End If
     
     For i = 1 To items_.Count
         If Lambda(items_(i), lambda_string).Evaluate Then
-            If f = False Then f = True Else Call Err.Raise(9002, "CollectionEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+            If f = False Then f = True Else Call Err.Raise(ErrNumber.NotSingleElement, "CollectionEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
             Call SetObjectAsBuffer(items_(i), SingleOrDefaultBy)
         End If
     Next i
@@ -201,21 +216,21 @@ End Function
 
 
 Public Function Skip(skip_index As Long) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, i As Long
+    Dim col As New Collection, c, i As Long
     For Each c In items_
         i = i + 1
-        If i > skip_index Then col.Add c
+        If i > skip_index Then Call col.Add(c)
     Next
-    Set Skip = recol.Initialize(col)
+    Set Skip = CollectionEx(col)
 End Function
 
 Public Function Take(take_index As Long) As CollectionEx
-    Dim col As New Collection, c, recol As New CollectionEx, i As Long
+    Dim col As New Collection, c, i As Long
     For Each c In items_
         i = i + 1
-        If i <= take_index Then col.Add c
+        If i <= take_index Then Call col.Add(c)
     Next
-    Set Take = recol.Initialize(col)
+    Set Take = CollectionEx(col)
 End Function
 
 Public Function AllBy(lambda_string As String) As Boolean
@@ -246,13 +261,24 @@ Public Function Contains(var) As Boolean
     Contains = False
 End Function
 
-Public Function Sum() As Double
-    Dim c, val As Double
+Public Function Sum(Optional lambda_string As String) As Double
+    Dim c, v, val As Double
+    
     If items_.Count = 0 Then Sum = 0: Exit Function
-    If IsNumeric(Items(1)) = False Then Err.Raise 9001, , Err.Description
-    For Each c In items_
-         val = val + c
-    Next
+    
+    If lambda_string = "" Then
+        For Each c In items_
+            If IsNumeric(c) = False Then Call Err.Raise(ErrNumber.NotExpectedType, "CollectionEx.Sum()", "Element should be numeric value")
+            val = val + c
+        Next
+    Else
+        For Each c In items_
+            v = Lambda(c, lambda_string).Evaluate
+            If IsNumeric(v) = False Then Call Err.Raise(ErrNumber.NotExpectedType, "CollectionEx.Sum()", "Element should be numeric value")
+            val = val + v
+        Next
+    End If
+    
     Sum = val
 End Function
 
@@ -271,7 +297,7 @@ Public Function Max(Optional lambda_string As String) As Variant
         tmp = items_(1)
         For i = 2 To items_.Count
             If items_(i) > tmp Then tmp = items_(i)
-    Next
+        Next
     Else
         tmp = Lambda(items_(1), lambda_string).Evaluate
         For i = 2 To items_.Count
@@ -298,17 +324,17 @@ Public Function Min(Optional lambda_string As String) As Variant
         For i = 2 To items_.Count
             v = Lambda(items_(i), lambda_string).Evaluate
             If v < tmp Then tmp = v
-    Next
+        Next
     End If
     
     Min = tmp
 End Function
 
-Public Function MaxBy(lambda_string As String) As Variant
+Public Function MaxBy(lambda_string As String) As Object
     Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
     
     If items_.Count = 0 Then Set MaxBy = Nothing: Exit Function
-    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "CollectionEx.MaxBy()", "Elements should be object.")
+    If IsObject(items_(1)) = False Then Call Err.Raise(ErrNumber.ElementsAreNotObject, "CollectionEx.MaxBy()", "Elements should be object.")
         
     temp_value = Lambda(items_(1), lambda_string).Evaluate
     Set temp_item = items_(1)
@@ -324,11 +350,11 @@ Public Function MaxBy(lambda_string As String) As Variant
     Set MaxBy = temp_item
 End Function
 
-Public Function MinBy(lambda_string As String) As Variant
+Public Function MinBy(lambda_string As String) As Object
     Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
     
     If items_.Count = 0 Then Set MinBy = Nothing: Exit Function
-    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "CollectionEx.MinBy()", "Elements should be object.")
+    If IsObject(items_(1)) = False Then Call Err.Raise(ErrNumber.ElementsAreNotObject, "CollectionEx.MinBy()", "Elements should be object.")
         
     temp_value = Lambda(items_(1), lambda_string).Evaluate
     Set temp_item = items_(1)
@@ -414,20 +440,21 @@ End Function
 
 Public Function ToArray()
     Dim arr, i As Long
+    
+    If items_.Count = 0 Then ToArray = Array(): Exit Function
     ReDim arr(0 To items_.Count - 1)
     
     For i = LBound(arr) To UBound(arr)
-        SetObjectAsBuffer Items.Item(i + 1), arr(i)
+        Call SetObjectAsBuffer(Items.Item(i + 1), arr(i))
     Next i
     ToArray = arr
 End Function
 
 
-
 ' private functions --------------------------------
 Private Function QuickSort(ByRef any_pairs As Collection, ByVal low_boundary As Long, ByVal up_boundary As Long, is_asc As Boolean) As Collection
     Dim i As Long, j As Long, pivot As Variant, temp, property_any_pairs As New Collection
-    
+        
     If any_pairs.Count <= 1 Then Set QuickSort = any_pairs: Exit Function
     
     i = low_boundary
@@ -474,7 +501,7 @@ Private Function Equals(comparing_item, compared_item) As Boolean
     Exit Function
     
 errUnImplementEquals:
-    Call Err.Raise(9001, "CollectionEx.Equals()", "Equality evaluation failed. Should """ & TypeName(comparing_item) & """ object has ""Equals()"" function.")
+    Call Err.Raise(ErrNumber.FailedToEvaluateEquals, "CollectionEx.Equals()", "Equality evaluation failed. Should """ & TypeName(comparing_item) & """ object has ""Equals()"" function.")
 End Function
 
 Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
@@ -486,4 +513,3 @@ Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) A
         SetObjectAsBuffer = False
     End If
 End Function
-

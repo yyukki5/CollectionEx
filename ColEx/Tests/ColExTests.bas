@@ -1,6 +1,11 @@
 Attribute VB_Name = "ColExTests"
 '<dir .\Tests /dir>
 
+' Note --------------------------------------
+' This is unit tests of ColEx.cls
+' Depend on: UnitTest.cls
+' -------------------------------------------
+
 Option Explicit
 
 Private Sub CreateTests()
@@ -27,6 +32,8 @@ Sub RunTests()
     test.RegisterTest "Test_MinMax_Value"
     test.RegisterTest "Test_MinMax_Object"
     test.RegisterTest "Test_MinByMaxBy_Object"
+    test.RegisterTest "Test_Sum"
+    test.RegisterTest "Test_Sum_HasNotNumeric"
     test.RegisterTest "Test_SpeedTests"
 
     test.RunTests UnitTest
@@ -654,6 +661,45 @@ Sub Test_MinByMaxBy_Object()
     End With
         
 End Sub
+
+'[Fact]
+Sub Test_Sum()
+    
+    ' Arrange
+    Dim cls As New Class1
+    Dim col As New Collection
+    Call col.Add(cls.Create(2))
+    Call col.Add(cls.Create(1))
+    Call col.Add(cls.Create(5))
+    Call col.Add(cls.Create(4))
+    Call col.Add(cls.Create(3))
+    
+    ' Act/Assert
+    With UnitTest
+        Call .NameOf("Sum")
+        Call .AssertEqual(22, ColEx(GetIntCollection).Sum)
+        Call .AssertEqual(15, ColEx(col).Sum("Abc"))
+        Call .AssertEqual(20, ColEx(col).Sum("Def.Def"))
+    End With
+        
+End Sub
+'[Fact]
+Sub Test_Sum_HasNotNumeric()
+    
+    ' Arrange
+    Dim cls As New Class1
+    
+    ' Act/Assert
+    With UnitTest
+        Call .NameOf("Sum, has not numeric value")
+        On Error Resume Next
+        Call ColEx(GetStringCollection()).Sum
+        Call .AssertHasError
+        On Error GoTo 0
+    End With
+        
+End Sub
+
 
 '[Fact]
 Sub Test_SpeedTests()
