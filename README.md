@@ -90,7 +90,7 @@ After Importing only 1 file to your VBA project, you can use it.
 
 
 ## Japanese Note
-CollectionEx を簡略化、軽量化したもの  
+CollectionEx を 簡略化、軽量化したもの （Lambda を使っていません）
 - 宣言済み かつ デフォルトメソッドが Create()なので、短い記述で使えます
 - Collection と同じように For Each でループを回すことも出来ます
 - 要素のプロパティを使ってLINQのようなメソッド(Where, Selectなど)が使えます  
