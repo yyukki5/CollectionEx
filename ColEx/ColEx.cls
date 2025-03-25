@@ -451,6 +451,26 @@ Public Function MinBy(property_name As String) As Variant
     Set MinBy = temp_item
 End Function
 
+Public Function Sum(Optional property_name As String) As Double
+    Dim c, v, val As Double
+    
+    If items_.Count = 0 Then Sum = 0: Exit Function
+    
+    If property_name = "" Then
+        For Each c In items_
+            If IsNumeric(c) = False Then Call Err.Raise(ErrNumber.NotExpectedType, "ColEx.Sum()", "Element should be numeric value")
+            val = val + c
+        Next
+    Else
+        For Each c In items_
+            v = CallByNames(c, property_name, VbGet)
+            If IsNumeric(v) = False Then Call Err.Raise(ErrNumber.NotExpectedType, "ColEx.Sum()", "Element should be numeric value")
+            val = val + v
+        Next
+    End If
+    
+    Sum = val
+End Function
 
 Public Function ToArray()
     Dim arr, i As Long
