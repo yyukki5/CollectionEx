@@ -11,8 +11,7 @@ Option Explicit
 
 ' Note --------------------------------------
 ' Project: https://github.com/yyukki5/CollectionEx
-' Version: 0.6.0 (developing)
-' Specification may be changed.
+' Version: 1.0.0
 ' -------------------------------------------
 
 Private items_ As Collection
@@ -28,6 +27,15 @@ Public Enum cexOperators
     cexLessThanOrEqualTo
 End Enum
 
+Private Enum ErrNumber
+    Unknown = 9200
+    SequenceIsEmpty
+    NoElementSatisfied
+    NotSingleElement
+    ElementsAreNotObject
+    FailedToEvaluateEquals
+    NotExpectedType
+End Enum
 
 
 Private Sub Class_Initialize()
@@ -71,21 +79,21 @@ End Property
 
 
 
-Public Function Add(class_item As Variant) As ColEx
-    Call items_.Add(class_item)
+Public Function Add(an_item As Variant, Optional a_key As String) As ColEx
+    If a_key = "" Then Call items_.Add(an_item) Else Call items_.Add(an_item, a_key)
     Set Add = Me
 End Function
 
-Public Function AddRange(col As Collection) As ColEx
+Public Function AddRange(any_items As Collection) As ColEx
     Dim c
-    For Each c In col
+    For Each c In any_items
         items_.Add c
     Next
     Set AddRange = Me
 End Function
 
-Public Function Remove(item_index As Long) As ColEx
-    Call items_.Remove(item_index)
+Public Function Remove(index_or_key) As ColEx
+    Call items_.Remove(index_or_key)
     Set Remove = Me
 End Function
 
@@ -137,14 +145,14 @@ Public Function First(Optional property_name As String, _
                       Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant)
     Dim i As Long
-    If items_.Count = 0 Then Call Err.Raise(9001, "ColEx.First()", "The sequence is empty")
+    If items_.Count = 0 Then Call Err.Raise(SequenceIsEmpty, "ColEx.First()", "The sequence is empty")
     If IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(1), First): Exit Function
     
     For i = 1 To items_.Count
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), First): Exit Function
     Next i
     
-    Call Err.Raise(9002, "ColEx.First()", "No element satisfies the comparing condition.")
+    Call Err.Raise(NoElementSatisfied, "ColEx.First()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function FirstOrDefault(Optional property_name As String, _
@@ -166,14 +174,14 @@ Public Function Last(Optional property_name As String, _
                       Optional compare_operator As cexOperators, _
                       Optional compare_value As Variant)
     Dim i As Long
-    If items_.Count = 0 Then Call Err.Raise(9001, "ColEx.Last()", "The sequence is empty")
+    If items_.Count = 0 Then Call Err.Raise(SequenceIsEmpty, "ColEx.Last()", "The sequence is empty")
     If IsMissing(compare_value) Then Call SetObjectAsBuffer(items_(items_.Count), Last): Exit Function
         
     For i = items_.Count To 1 Step -1
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then Call SetObjectAsBuffer(items_(i), Last): Exit Function
     Next i
     
-    Call Err.Raise(9002, "ColEx.Last()", "No element satisfies the comparing condition.")
+    Call Err.Raise(NoElementSatisfied, "ColEx.Last()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function LastOrDefault(Optional property_name As String, _
@@ -197,22 +205,25 @@ Public Function SingleBy(Optional property_name As String, _
     Dim i As Long, f As Boolean
     If IsMissing(compare_value) Then
         If items_.Count = 0 Then
-            Call Err.Raise(9001, "ColEx.SingleBy()", "The sequence is empty")
+            Call Err.Raise(SequenceIsEmpty, "ColEx.SingleBy()", "The sequence is empty")
+            
         ElseIf items_.Count = 1 Then
             Call SetObjectAsBuffer(items_(1), SingleBy): Exit Function
+        
         Else
-            Call Err.Raise(9003, "ColEx.SingleBy()", "The input sequence contains more than one element.")
+            Call Err.Raise(NotSingleElement, "ColEx.SingleBy()", "The input sequence contains more than one element.")
+        
         End If
     End If
     
     For i = 1 To items_.Count
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then
-            If f = False Then f = True Else Call Err.Raise(9002, "ColEx.SingleBy()", "The input sequence contains more than one element.")
+            If f = False Then f = True Else Call Err.Raise(NotSingleElement, "ColEx.SingleBy()", "The input sequence contains more than one element.")
             Call SetObjectAsBuffer(items_(i), SingleBy)
         End If
     Next i
         
-    If f = False Then Call Err.Raise(9002, "ColEx.SingleBy()", "No element satisfies the comparing condition.")
+    If f = False Then Call Err.Raise(NoElementSatisfied, "ColEx.SingleBy()", "No element satisfies the comparing condition.")
 End Function
 
 Public Function SingleOrDefaultBy(Optional property_name As String, _
@@ -226,13 +237,13 @@ Public Function SingleOrDefaultBy(Optional property_name As String, _
         ElseIf items_.Count = 1 Then
             Call SetObjectAsBuffer(items_(1), SingleOrDefaultBy): Exit Function
         Else
-            Call Err.Raise(9003, "ColEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+            Call Err.Raise(NotSingleElement, "ColEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
         End If
     End If
     
     For i = 1 To items_.Count
         If Compare2(items_(i), property_name, compare_operator, compare_value) Then
-            If f = False Then f = True Else Call Err.Raise(9003, "ColEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
+            If f = False Then f = True Else Call Err.Raise(NotSingleElement, "ColEx.SingleOrDefaultBy()", "The input sequence contains more than one element.")
             Call SetObjectAsBuffer(items_(i), SingleOrDefaultBy)
         End If
     Next i
@@ -242,25 +253,25 @@ End Function
 
 
 Public Function Take(cnt As Long) As ColEx
-    Dim c As Variant, col As New Collection, i As Long
+    Dim c As Variant, col As New Collection, recol As New ColEx, i As Long
     
     For Each c In items_
         i = i + 1
         If i <= cnt Then Call col.Add(c)
     Next
     
-    Set Take = ColEx(col)
+    Set Take = recol.Initialize(col)
 End Function
 
 Public Function Skip(cnt As Long) As ColEx
-    Dim c As Variant, col As New Collection, i As Long
+    Dim c As Variant, col As New Collection, recol As New ColEx, i As Long
     
     For Each c In items_
         i = i + 1
         If i > cnt Then Call col.Add(c)
     Next
     
-    Set Skip = ColEx(col)
+    Set Skip = recol.Initialize(col)
 End Function
 
 
@@ -415,7 +426,7 @@ Public Function MaxBy(property_name As String) As Variant
     Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
     
     If items_.Count = 0 Then Set MaxBy = Nothing: Exit Function
-    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MaxBy()", "Elements should be object.")
+    If IsObject(items_(1)) = False Then Call Err.Raise(ElementsAreNotObject, "ColEx.MaxBy()", "Elements should be object.")
     
     temp_value = CallByNames(items_(1), property_name, VbGet)
     Set temp_item = items_(1)
@@ -435,7 +446,7 @@ Public Function MinBy(property_name As String) As Variant
     Dim v As Variant, temp_value As Variant, temp_item As Variant, i As Long
     
     If items_.Count = 0 Then Set MinBy = Nothing: Exit Function
-    If IsObject(items_(1)) = False Then Call Err.Raise(9001, "ColEx.MinBy()", "Elements should be object.")
+    If IsObject(items_(1)) = False Then Call Err.Raise(ElementsAreNotObject, "ColEx.MinBy()", "Elements should be object.")
         
     temp_value = CallByNames(items_(1), property_name, VbGet)
     Set temp_item = items_(1)
@@ -472,7 +483,7 @@ Public Function Sum(Optional property_name As String) As Double
     Sum = val
 End Function
 
-Public Function ToArray()
+Public Function ToArray() As Variant
     Dim arr, i As Long
     
     If items_.Count = 0 Then Exit Function
@@ -485,7 +496,7 @@ Public Function ToArray()
     ToArray = arr
 End Function
 
-Public Function ToArray2D(ParamArray property_names())
+Public Function ToArray2D(ParamArray property_names()) As Variant
     Dim arr, i As Long, j As Long, cnt As Long, p As Variant, ps As Variant, l As Long, u As Long
     
     If items_.Count = 0 Then Exit Function
@@ -631,7 +642,7 @@ Private Function Equals(comparing_item, compared_item) As Boolean
     Exit Function
     
 errUnImplementEquals:
-    Call Err.Raise(9001, "ColEx.Equals()", "Equality evaluation failed. Should """ & TypeName(comparing_item) & """ object has ""Equals()"" function.")
+    Call Err.Raise(FailedToEvaluateEquals, "ColEx.Equals()", "Equality evaluation failed. Should """ & TypeName(comparing_item) & """ object has ""Equals()"" function.")
 End Function
 
 Private Function SetObjectAsBuffer(ByRef unverified_value, ByRef buffer_value) As Boolean
