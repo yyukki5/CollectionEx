@@ -23,6 +23,3 @@ Sub SampleCode()
         Debug.Print res(i)
     Next i
 End Sub
-
-
-
